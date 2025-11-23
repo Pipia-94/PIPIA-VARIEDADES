@@ -1,283 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>PIPIA VARIEDADES</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>PIPIA Variedades - Catálogo Shein Style</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
 
-<style>
-  body {
-    font-family: "Poppins", sans-serif;
-    margin: 0;
-    background: #f0f2f5;
-  }
+    #catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
 
-  header {
-    background: #6a11cb;
-    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-    padding: 20px;
-    color: white;
-    text-align: center;
-    font-size: 26px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-  }
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-  h2 {
-    margin-left: 20px;
-    margin-top: 30px;
-    color: #333;
-  }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
 
-  /* GRID DEL CATALOGO */
-  #catalog {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    padding: 20px;
-  }
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
 
-  .product {
-    background: white;
-    padding: 15px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
+    .product-info {
+      padding: 15px;
+      flex: 1;
+    }
 
-  .product:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-  }
+    .product-info h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #333;
+    }
 
-  .product img {
-    width: 100%;
-    border-radius: 10px;
-    height: 150px;
-    object-fit: cover;
-  }
+    .product-info p {
+      margin: 8px 0;
+      font-weight: bold;
+      color: #6a11cb;
+    }
 
-  .btn {
-    margin-top: 10px;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    background: #2575fc;
-    color: white;
-    cursor: pointer;
-    font-size: 15px;
-    transition: 0.2s;
-  }
+    .product-info button {
+      padding: 10px;
+      background: #6a11cb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
 
-  .btn:hover {
-    background: #1c5cd6;
-  }
-
-  /* CARRITO */
-  .cart-box {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-  }
-
-  .delete-btn {
-    background: red;
-    color: white;
-    border: none;
-    padding: 5px 8px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  /* ADMIN */
-  .admin-box {
-    background: #ffffff;
-    padding: 20px;
-    margin: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-
-  input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: 1px solid #bbb;
-    margin-bottom: 12px;
-  }
-
-  .admin-btn {
-    width: 100%;
-    background: #6a11cb;
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .admin-btn:hover {
-    background: #5710a8;
-  }
-
-</style>
+    .product-info button:hover {
+      background: #5710a8;
+    }
+  </style>
 </head>
-
 <body>
 
-<header>PIPIA VARIEDADES</header>
+  <header>Pipia Variedades</header>
 
-<h2>Catálogo</h2>
-<div id="catalog"></div>
+  <div id="catalog"></div>
 
-<h2>Carrito</h2>
-<div class="cart-box" id="cart"></div>
+  <script>
+    // Simulación de productos (puedes usar tus datos reales)
+    const products = [
+      { id: 1, name: "Camiseta Básica", price: 12.99, img: "https://via.placeholder.com/300x300?text=Camiseta" },
+      { id: 2, name: "Taza Cerámica", price: 8.5, img: "https://via.placeholder.com/300x300?text=Taza" },
+      { id: 3, name: "Bolso Elegante", price: 25.0, img: "https://via.placeholder.com/300x300?text=Bolso" },
+    ];
 
-<h2>Administrador</h2>
-<div class="admin-box">
-  <input id="adminPass" type="password" placeholder="Contraseña admin">
-  <button class="admin-btn" onclick="loginAdmin()">Entrar</button>
+    function renderCatalog() {
+      const catalog = document.getElementById("catalog");
+      catalog.innerHTML = "";
 
-  <div id="adminPanel" style="display:none; margin-top:20px;">
-    <h3>Agregar producto</h3>
-    <input id="pName" placeholder="Nombre del producto">
-    <input id="pPrice" type="number" placeholder="Precio">
-    <input id="pImg" type="file">
-    <button class="admin-btn" onclick="addProduct()">Agregar producto</button>
-  </div>
-</div>
+      products.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" />
+          <div class="product-info">
+            <h3>${p.name}</h3>
+            <p>Q${p.price.toFixed(2)}</p>
+            <button onclick="addToCart(${p.id})">Agregar al carrito</button>
+          </div>
+        `;
+        catalog.appendChild(card);
+      });
+    }
 
-<script>
-// ---------- LOCAL STORAGE ----------
-function load(key, fallback) {
-  try {
-    const val = JSON.parse(localStorage.getItem(key));
-    return val !== null ? val : fallback;
-  } catch {
-    return fallback;
-  }
-}
+    function addToCart(productId) {
+      alert("Agregar al carrito: " + productId);
+      // Aquí pones tu lógica real de carrito
+    }
 
-function save(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
-let products = load("products", []);
-let cart = load("cart", []);
-
-// ---------- RENDER DEL CATALOGO ----------
-function renderCatalog() {
-  const div = document.getElementById("catalog");
-  div.innerHTML = "";
-
-  if (products.length === 0) {
-    div.innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#777;'>No hay productos aún.</p>";
-    return;
-  }
-
-  products.forEach((p, i) => {
-    const box = document.createElement("div");
-    box.className = "product";
-    box.innerHTML = `
-      <img src="${p.img}">
-      <h3>${p.name}</h3>
-      <p><strong>Q${p.price}</strong></p>
-      <button class="btn" onclick="addToCart(${i})">Agregar al carrito</button>
-    `;
-    div.appendChild(box);
-  });
-}
-
-// ---------- CARRITO ----------
-function renderCart() {
-  const div = document.getElementById("cart");
-
-  if (cart.length === 0) {
-    div.innerHTML = "<em>Carrito vacío</em>";
-    return;
-  }
-
-  let html = "";
-  let total = 0;
-
-  cart.forEach((c, i) => {
-    html += `
-      <div class='cart-item'>
-        <span>${c.name} — Q${c.price}</span>
-        <button class="delete-btn" onclick="removeCart(${i})">X</button>
-      </div>
-    `;
-    total += Number(c.price);
-  });
-
-  html += `<h3 style="margin-top:15px;">Total: Q${total}</h3>`;
-
-  div.innerHTML = html;
-}
-
-function addToCart(i) {
-  cart.push(products[i]);
-  save("cart", cart);
-  renderCart();
-}
-
-function removeCart(i) {
-  cart.splice(i, 1);
-  save("cart", cart);
-  renderCart();
-}
-
-// ---------- ADMIN ----------
-function loginAdmin() {
-  const pass = document.getElementById("adminPass").value;
-
-  if (pass === "1234") {
-    document.getElementById("adminPanel").style.display = "block";
-  } else {
-    alert("Contraseña incorrecta");
-  }
-}
-
-function addProduct() {
-  const name = document.getElementById("pName").value;
-  const price = document.getElementById("pPrice").value;
-  const file = document.getElementById("pImg").files[0];
-
-  if (!name || !price || !file) return alert("Faltan datos");
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    products.push({
-      name,
-      price,
-      img: e.target.result
-    });
-    save("products", products);
     renderCatalog();
-    alert("Producto agregado exitosamente ✓");
-  };
-
-  reader.readAsDataURL(file);
-}
-
-// ---------- INICIO ----------
-renderCatalog();
-renderCart();
-</script>
+  </script>
 
 </body>
 </html>
