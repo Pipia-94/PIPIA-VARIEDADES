@@ -1,252 +1,65 @@
-<!doctype html>
-
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Catálogo + Carrito → Enviar por WhatsApp</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo PipiA Yogurt</title>
   <style>
-    :root{--accent:#0b84ff}
-    body{font-family:Inter, system-ui, Arial; margin:0; padding:20px; background:#f6f8fb}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:20px;margin:0}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-    .card{background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(20,30,60,0.06)}
-    img.product{width:100%;height:140px;object-fit:cover;border-radius:8px}
-    .price{font-weight:700;margin-top:8px}
-    button{background:var(--accent);border:0;color:#fff;padding:8px 10px;border-radius:8px;cursor:pointer}
-    .muted{color:#6b7280;font-size:13px}
-    .cart-btn{position:fixed;right:20px;bottom:20px;background:#25D366;border-radius:50%;width:60px;height:60px;box-shadow:0 8px 20px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
-    .drawer{position:fixed;right:20px;bottom:100px;width:360px;max-width:95%;background:#fff;border-radius:12px;padding:12px;box-shadow:0 18px 40px rgba(15,25,50,0.12)}
-    .row{display:flex;gap:8px;align-items:center}
-    input[type="number"]{width:64px}
-    .small{font-size:13px}
-    form{display:flex;gap:8px;flex-wrap:wrap}
-    input,select{padding:8px;border-radius:8px;border:1px solid #e6e9ef}
-    .btn-ghost{background:transparent;border:1px solid #e6e9ef;color:#111}
-    .admin-bar{display:flex;gap:8px;align-items:center}
-    .editable{border:1px dashed transparent;padding:6px}
-    .editable.editing{border-color:#cbd5e1}
-    footer{margin-top:24px;color:#6b7280;font-size:13px}
-  </style>
-</head>
-<body>
-  <header>
-    <div>
-      <h1>Catálogo — Generar carrito y enviar a WhatsApp</h1>
-      <div class="muted">Haz clic en "Añadir" para agregar al carrito. También puedes agregar productos nuevos (modo admin).</div>
-    </div>
-    <div class="admin-bar">
-      <label class="small">Modo admin:</label>
-      <input id="adminToggle" type="checkbox">
-      <input id="adminPass" placeholder="contraseña admin" type="password" style="width:140px">
-    </div>
-  </header>  <section style="margin-bottom:14px">
-    <form id="addProductForm" onsubmit="event.preventDefault(); addProductFromForm();" style="align-items:center">
-      <input id="pName" placeholder="Nombre del producto" required>
-      <input id="pPrice" placeholder="Precio (Q)" type="number" min="0" step="0.01" required>
-      <input id="pImage" type="file" accept="image/*">
-      <button class="btn-ghost" id="addBtn" type="submit">Añadir producto</button>
-      <div id="formHelp" class="muted small">(modo admin habilitado para poder añadir)</div>
-    </form>
-  </section>  <main>
-    <div class="grid" id="products"></div>
-  </main><button class="cart-btn" id="openCart" title="Ver carrito">🛒</button>
-
-  <div class="drawer" id="cartDrawer" style="display:none">
-    <h3>Tu carrito</h3>
-    <div id="cartItems"></div>
-    <div style="margin-top:12px" class="row">
-      <strong>Total: Q<span id="cartTotal">0.00</span></strong>
-      <div style="flex:1"></div>
-      <button id="sendWhats">Enviar por WhatsApp</button>
-    </div>
-    <div style="margin-top:8px" class="row">
-      <button id="clearCart" class="btn-ghost">Vaciar carrito</button>
-      <div style="flex:1"></div>
-      <button id="closeCart" class="btn-ghost">Cerrar</button>
-    </div>
-    <div style="margin-top:10px" class="muted small">Se abrirá WhatsApp con un mensaje listo para enviarme al número proporcionado.</div>
-  </div>  <footer>
-    Número destino (WhatsApp): <a href="https://wa.me/50256320811" target="_blank">+502 5632 0811</a>
-  </footer>  <script>
-    // Número fijo que nos diste
-    const WHATSAPP_NUMBER = '50256320811';
-
-    // Productos iniciales (ejemplo)
-    let products = [
-      {id:1, name:'Camiseta retro', price:120.00, img:'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=600&auto=format&fit=crop&crop=faces'},
-      {id:2, name:'Taza edición', price:45.50, img:'https://images.unsplash.com/photo-1517686469429-8bdb88d8d14f?q=80&w=600&auto=format&fit=crop&crop=faces'},
-      {id:3, name:'Pegatina set (5)', price:25.00, img:'https://images.unsplash.com/photo-1524253482453-3fed8d2fe12b?q=80&w=600&auto=format&fit=crop&crop=faces'}
-    ];
-
-    // Cart model {productId, qty, customName, customPrice}
-    let cart = [];
-
-    // Admin simple check
-    const ADMIN_PASSWORD = 'admin123' // Contraseña visible aquí; // solo ejemplo local
-
-    const productsEl = document.getElementById('products');
-    const cartDrawer = document.getElementById('cartDrawer');
-    const cartItemsEl = document.getElementById('cartItems');
-    const cartTotalEl = document.getElementById('cartTotal');
-    const addBtn = document.getElementById('addBtn');
-
-    function renderProducts(){
-      productsEl.innerHTML = '';
-      products.forEach(p=>{
-        const card = document.createElement('div'); card.className='card';
-        card.innerHTML = `
-          <img class="product" src="${p.img||'https://via.placeholder.com/400x300?text=Sin+imagen'}" alt="${escapeHtml(p.name)}">
-          <div style="margin-top:8px"><strong>${escapeHtml(p.name)}</strong></div>
-          <div class="price">Q ${Number(p.price).toFixed(2)}</div>
-          <div style="margin-top:8px" class="row">
-            <button onclick="addToCart(${p.id})">Añadir</button>
-            <button class="btn-ghost" onclick="addCustomToCartPrompt(${p.id})">Personalizar</button>
-            <div style="flex:1"></div>
-            <button class="btn-ghost" onclick="editProduct(${p.id})">✏️</button>
-          </div>
-        `;
-        productsEl.appendChild(card);
-      });
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #fafafa;
     }
-
-    function addToCart(id){
-      const item = cart.find(c=>c.productId===id && !c.custom);
-      if(item) item.qty++;
-      else cart.push({productId:id, qty:1, custom:false});
-      renderCart();
-      openDrawer();
+    header {
+      background: #ff4fb3;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
     }
-
-    function addCustomToCartPrompt(id){
-      const p = products.find(x=>x.id===id);
-      const customName = prompt('Nombre (por ejemplo: Camiseta - talla M):', p.name);
-      if(!customName) return;
-      const priceStr = prompt('Precio (Q):', p.price);
-      const price = parseFloat(priceStr);
-      if(isNaN(price)) return alert('Precio inválido');
-      cart.push({productId:id, qty:1, custom:true, customName, customPrice:price});
-      renderCart(); openDrawer();
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
     }
-
-    function addProductFromForm(){
-      // only allowed in admin mode
-      if(!isAdmin()){ alert('Activa modo admin y coloca la contraseña.'); return; }
-      const name = document.getElementById('pName').value.trim();
-      const price = parseFloat(document.getElementById('pPrice').value);
-      const file = document.getElementById('pImage').files[0];
-      if(!name || isNaN(price)) return alert('Completa nombre y precio');
-      if(file){
-        const reader = new FileReader();
-        reader.onload = ()=>{
-          const imgData = reader.result;
-          pushNewProduct(name, price, imgData);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        pushNewProduct(name, price, '');
-      }
-      // reset form
-      document.getElementById('addProductForm').reset();
+    .product {
+      background: #fff;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
     }
-
-    function pushNewProduct(name, price, img){
-      const id = (products.length?Math.max(...products.map(p=>p.id))+1:1);
-      products.push({id, name, price: Number(price), img});
-      renderProducts();
+    .product img {
+      width: 140px;
+      height: 140px;
+      border-radius: 12px;
+      object-fit: cover;
     }
-
-    function renderCart(){
-      cartItemsEl.innerHTML = '';
-      let total = 0;
-      if(cart.length===0) cartItemsEl.innerHTML = '<div class="muted">El carrito está vacío</div>';
-      cart.forEach((c, idx)=>{
-        const p = products.find(x=>x.id===c.productId) || {name:'Producto eliminado', price:0};
-        const name = c.custom ? c.customName : p.name;
-        const price = c.custom ? c.customPrice : p.price;
-        total += price * c.qty;
-        const row = document.createElement('div'); row.className='row'; row.style.marginTop='8px';
-        row.innerHTML = `
-          <div style="flex:1">
-            <div><strong>${escapeHtml(name)}</strong></div>
-            <div class="small muted">Q ${Number(price).toFixed(2)} c/u</div>
-          </div>
-          <div class="row">
-            <input type="number" min="1" value="${c.qty}" onchange="updateQty(${idx}, this.value)">
-            <button class="btn-ghost" onclick="removeItem(${idx})">Eliminar</button>
-          </div>
-        `;
-        cartItemsEl.appendChild(row);
-      });
-      cartTotalEl.textContent = Number(total).toFixed(2);
+    .product button {
+      background: #ff4fb3;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
     }
-
-    function updateQty(index, value){
-      const v = parseInt(value);
-      if(isNaN(v) || v<1) return renderCart();
-      cart[index].qty = v; renderCart();
+    #carritoBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4caf50;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-
-    function removeItem(index){ cart.splice(index,1); renderCart(); }
-
-    function clearCart(){ if(confirm('Vaciar carrito?')){ cart=[]; renderCart(); } }
-
-    function sendWhatsApp(){
-      if(cart.length===0) return alert('Carrito vacío');
-      let lines = [];
-      lines.push('*Nuevo pedido desde el catálogo web*');
-      lines.push('');
-      let total = 0;
-      cart.forEach(c=>{
-        const p = products.find(x=>x.id===c.productId) || {name:'Producto', price:0};
-        const name = c.custom ? c.customName : p.name;
-        const price = c.custom ? c.customPrice : p.price;
-        const line = `${c.qty} x ${name} — Q ${Number(price).toFixed(2)} (subtotal: Q ${ (price*c.qty).toFixed(2) })`;
-        lines.push(line);
-        total += price*c.qty;
-      });
-      lines.push('');
-      lines.push(`*Total: Q ${Number(total).toFixed(2)}*`);
-      lines.push('');
-      lines.push('Datos de contacto (escribe tu nombre y dirección aquí):');
-
-      const text = encodeURIComponent(lines.join('\n'));
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-      window.open(url, '_blank');
-    }
-
-    function openDrawer(){ cartDrawer.style.display='block'; }
-    function closeDrawer(){ cartDrawer.style.display='none'; }
-
-    document.getElementById('openCart').addEventListener('click', ()=>{ openDrawer(); renderCart(); });
-    document.getElementById('closeCart').addEventListener('click', closeDrawer);
-    document.getElementById('clearCart').addEventListener('click', clearCart);
-    document.getElementById('sendWhats').addEventListener('click', sendWhatsApp);
-
-    // Simple edit product flow
-    function editProduct(id){
-      if(!isAdmin()) return alert('Activa modo admin con la contraseña.');
-      const p = products.find(x=>x.id===id);
-      const newName = prompt('Nuevo nombre:', p.name);
-      if(newName) p.name = newName;
-      const newPriceStr = prompt('Nuevo precio (Q):', p.price);
-      const newPrice = parseFloat(newPriceStr);
-      if(!isNaN(newPrice)) p.price = newPrice;
-      renderProducts();
-    }
-
-    function isAdmin(){
-      const toggle = document.getElementById('adminToggle').checked;
-      const pass = document.getElementById('adminPass').value;
-      return toggle && pass===ADMIN_PASSWORD;
-    }
-
-    // tiny helper
-    function escapeHtml(str){ return String(str).replace(/[&<>\"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]||c)); }
-
-    // Initial render
-    renderProducts();
-    renderCart();
-  </script></body>
-</html>
+    #adminPanel {
+      margin-top: 40px;
+      padding: 20px;
+      background: #ffe3f3;
