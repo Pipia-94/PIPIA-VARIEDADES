@@ -1,127 +1,175 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PIPIA VARIEDADES</title>
+<meta charset="UTF-8">
+<title>PIPIA VARIEDADES</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- React + ReactDOM + Babel (FUNCIONA EN GITHUB PAGES) -->
-  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f6f6f6;
+  }
+  h1 { text-align: center; }
 
-  <style>
-    body { margin:0; font-family: Arial; background:#fafafa; }
-    header { background:#222; color:white; padding:15px; text-align:center; }
-    .container { padding:20px; max-width:900px; margin:auto; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:15px; }
-    .card { background:white; border-radius:10px; padding:15px; box-shadow:0 0 10px #0002; }
-    .card img { width:100%; height:160px; object-fit:cover; border-radius:8px; }
-    button { padding:10px; width:100%; margin-top:8px; background:#222; color:white; border:none; border-radius:6px; cursor:pointer; }
-    button:active { opacity:.7; }
-    input { width:100%; padding:10px; margin-top:8px; }
-  </style>
+  .product {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 5px #ccc;
+  }
+
+  .cart {
+    background: #fff4c2;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 10px;
+    border: none;
+    background: #008cff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button.red {
+    background: red;
+  }
+</style>
 </head>
+
 <body>
 
-<header>PIPIA VARIEDADES</header>
-<div id="root"></div>
+<h1>PIPIA VARIEDADES</h1>
 
-<script type="text/babel">
+<h2>Catálogo</h2>
+<div id="catalog"></div>
 
-/* ---------------------- STORAGE ---------------------- */
-const load = (k,f)=>{ try{return JSON.parse(localStorage.getItem(k))||f}catch{return f}};
-const save = (k,v)=>localStorage.setItem(k,JSON.stringify(v));
+<h2>Carrito</h2>
+<div class="cart" id="cart"></div>
 
-/* ---------------------- APP ---------------------- */
-const App = () => {
-  const [products,setProducts]=React.useState(load("products",[]));
-  const [cart,setCart]=React.useState([]);
-  const [admin,setAdmin]=React.useState(false);
+<h2>Admin</h2>
+<input id="adminPass" type="password" placeholder="Contraseña admin">
+<button onclick="loginAdmin()">Entrar</button>
 
-  const loginAdmin=()=>{
-    const p=prompt("Clave admin:");
-    if(p==="1234") setAdmin(true);
-    else alert("Clave incorrecta");
-  };
+<div id="adminPanel" style="display:none;">
+  <h3>Agregar producto</h3>
+  <input id="pName" placeholder="Nombre"><br><br>
+  <input id="pPrice" type="number" placeholder="Precio"><br><br>
+  <input id="pImg" type="file"><br><br>
+  <button onclick="addProduct()">Agregar</button>
+</div>
 
-  const addProduct=()=>{
-    const name=prompt("Nombre:");
-    if(!name) return;
-    const price=prompt("Precio:");
-    if(!price) return;
+<script>
+// ===== Utilidades localStorage =====
+function load(key, fallback) {
+  try { 
+    const val = JSON.parse(localStorage.getItem(key));
+    return val !== null ? val : fallback;
+  } catch(e) {
+    return fallback;
+  }
+}
 
-    const file=document.createElement("input");
-    file.type="file";
+function save(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
 
-    file.onchange=e=>{
-      const reader=new FileReader();
-      reader.onload=()=>{
-        const newP={id:Date.now(),name,price:Number(price),img:reader.result};
-        const newList=[...products,newP];
-        setProducts(newList);
-        save("products",newList);
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    };
+// ===== Datos iniciales =====
+let products = load("products", []);
+let cart = load("cart", []);
 
-    file.click();
-  };
+// ===== Mostrar catálogo =====
+function renderCatalog() {
+  const div = document.getElementById("catalog");
+  div.innerHTML = "";
 
-  const deleteProduct=id=>{
-    if(!confirm("Eliminar?")) return;
-    const list=products.filter(p=>p.id!==id);
-    setProducts(list);
-    save("products",list);
-  };
+  products.forEach((p, i) => {
+    const box = document.createElement("div");
+    box.className = "product";
+    box.innerHTML = `
+      <img src="${p.img}" width="120"><br>
+      <strong>${p.name}</strong><br>
+      Q${p.price}<br><br>
+      <button onclick="addToCart(${i})">Agregar al carrito</button>
+    `;
+    div.appendChild(box);
+  });
+}
 
-  const addToCart=(p)=>setCart([...cart,p]);
+// ===== Carrito =====
+function renderCart() {
+  const div = document.getElementById("cart");
+  if (cart.length === 0) {
+    div.innerHTML = "<em>Carrito vacío</em>";
+    return;
+  }
 
-  const checkout=()=>{
-    if(cart.length===0) return alert("Carrito vacío");
-    const total=cart.reduce((t,p)=>t+p.price,0);
-    alert("Pedido realizado. Total: Q"+total);
-    setCart([]);
-  };
+  let html = "";
+  let total = 0;
 
-  return (
-    <div className="container">
-
-      {!admin && <button onClick={loginAdmin}>Entrar como Admin</button>}
-      {admin && <button style={{background:"green"}} onClick={addProduct}>Agregar Producto</button>}
-
-      <h2>Productos</h2>
-      <div className="grid">
-        {products.length===0 && <p>No hay productos.</p>}
-
-        {products.map(p=>(
-          <div className="card" key={p.id}>
-            <img src={p.img}/>
-            <h3>{p.name}</h3>
-            <p>Q{p.price}</p>
-
-            <button onClick={()=>addToCart(p)}>Agregar al carrito</button>
-
-            {admin && <button style={{background:"red"}} onClick={()=>deleteProduct(p.id)}>Eliminar</button>}
-          </div>
-        ))}
+  cart.forEach((c, i) => {
+    html += `
+      <div>
+        ${c.name} - Q${c.price}
+        <button class="red" onclick="removeCart(${i})">X</button>
       </div>
+    `;
+    total += Number(c.price);
+  });
 
-      <h2>Carrito</h2>
-      {cart.length===0 && <p>No hay productos en el carrito.</p>}
+  html += `<h3>Total: Q${total}</h3>`;
+  div.innerHTML = html;
+}
 
-      {cart.map((p,i)=>(
-        <div key={i}>{p.name} — Q{p.price}</div>
-      ))}
+function addToCart(i) {
+  cart.push(products[i]);
+  save("cart", cart);
+  renderCart();
+}
 
-      {cart.length>0 && <button style={{background:"#0066ff"}} onClick={checkout}>Finalizar Pedido</button>}
-    </div>
-  );
-};
+function removeCart(i) {
+  cart.splice(i, 1);
+  save("cart", cart);
+  renderCart();
+}
 
-/* ---- RENDER (React 17 funciona perfecto en GitHub Pages) ----- */
-ReactDOM.render(<App/>, document.getElementById("root"));
+// ===== Admin =====
+function loginAdmin() {
+  const pass = document.getElementById("adminPass").value;
+  if (pass === "1234") {
+    document.getElementById("adminPanel").style.display = "block";
+  } else {
+    alert("Contraseña incorrecta");
+  }
+}
 
+function addProduct() {
+  const name = document.getElementById("pName").value;
+  const price = document.getElementById("pPrice").value;
+  const file = document.getElementById("pImg").files[0];
+
+  if (!name || !price || !file) return alert("Faltan datos");
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    products.push({ name, price, img: e.target.result });
+    save("products", products);
+    renderCatalog();
+    alert("Producto agregado.");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+// ===== Inicial =====
+renderCatalog();
+renderCart();
 </script>
 
 </body>
