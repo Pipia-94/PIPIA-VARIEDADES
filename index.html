@@ -1,225 +1,345 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lácteos Pipia - Catálogo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Quicksand', sans-serif;
-      background: #f6f1e9;
-      color: #333;
-    }
-    header {
-      background: #ffdd57;
-      padding: 20px;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 600;
-      color: #222;
-    }
-    .catalog {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-    }
-    .product {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s;
-    }
-    .product:hover {
-      transform: scale(1.03);
-    }
-    .product img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-    .product-body {
-      padding: 15px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .product-body h3 {
-      margin: 0 0 10px;
-      font-size: 1.1rem;
-    }
-    .product-body p {
-      margin: 0 0 10px;
-      font-size: 0.95rem;
-    }
-    .product-body .price {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .product-body button {
-      padding: 10px;
-      background: #ff7f50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .product-body button:hover {
-      background: #ff6333;
-    }
-    .cart-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #ff7f50;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      z-index: 100;
-    }
-    .cart-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 200;
-    }
-    .cart-content {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 80%;
-      overflow-y: auto;
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .close-cart {
-      background: #ff7f50;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      float: right;
-      margin-bottom: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lácteos Pipia - Catálogo Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    background: #f5f0eb; /* beige pastel */
+    color: #333;
+  }
+
+  header {
+    background: #d6cbd3; /* gris pastel */
+    padding: 20px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #5d3a3a; /* rosado oscuro */
+  }
+
+  .catalog {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .product {
+    background: #fff0f5; /* rosa pastel */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+  }
+
+  .product:hover {
+    transform: scale(1.03);
+  }
+
+  .product img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #a7e0e0; /* aqua pastel */
+  }
+
+  .product-body {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .product-body h3 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+  }
+
+  .product-body p {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+  }
+
+  .product-body .price {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .product-body button {
+    padding: 10px;
+    background: #ffb6c1; /* rosa pastel */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .product-body button:hover {
+    background: #ff8da1;
+  }
+
+  .cart-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #a7e0e0; /* aqua pastel */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 100;
+  }
+
+  .cart-modal, .admin-modal {
+    position: fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:200;
+  }
+
+  .modal-content {
+    background: #fff;
+    border-radius:12px;
+    padding:20px;
+    width:90%;
+    max-width:500px;
+    max-height:80%;
+    overflow-y:auto;
+  }
+
+  .close-cart, .close-admin {
+    background: #ffb6c1;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    float:right;
+    margin-bottom: 10px;
+  }
+
+  input, textarea {
+    width:100%;
+    padding:8px;
+    margin-bottom:10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+  }
+
+  .admin-login-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #ffb6c1;
+    color:white;
+    border:none;
+    border-radius:6px;
+    padding:10px;
+    cursor:pointer;
+    z-index:101;
+  }
+
+  button.send-order {
+    background:#a7e0e0;
+    color:white;
+    width:100%;
+    margin-top:15px;
+  }
+
+  button.send-order:hover {
+    background:#7fdede;
+  }
+</style>
 </head>
 <body>
-  <header>Lácteos Pipia</header>
 
-  <button class="cart-button" id="cartBtn">🛒</button>
+<header>Lácteos Pipia</header>
 
-  <div class="catalog" id="catalog"></div>
+<button class="cart-button" id="cartBtn">🛒</button>
+<button class="admin-login-btn" id="adminBtn">Admin</button>
 
-  <div class="cart-modal" id="cartModal">
-    <div class="cart-content">
-      <button class="close-cart" id="closeCart">Cerrar</button>
-      <h2>Tu carrito</h2>
-      <div id="cartItems"></div>
-      <h3 id="cartTotal">Total: $0</h3>
-    </div>
+<div class="catalog" id="catalog"></div>
+
+<!-- Carrito -->
+<div class="cart-modal" id="cartModal">
+  <div class="modal-content">
+    <button class="close-cart" id="closeCart">Cerrar</button>
+    <h2>Tu carrito</h2>
+    <div id="cartItems"></div>
+    <h3 id="cartTotal">Total: $0</h3>
+    <button class="send-order" id="sendOrder">Enviar Pedido</button>
   </div>
+</div>
 
-  <script>
-    const products = [
-      {id:1, name:'Leche Entera Pipia 1L', price:20, img:'https://via.placeholder.com/400x300?text=Leche+Entera'},
-      {id:2, name:'Queso Mozzarella 200g', price:45, img:'https://via.placeholder.com/400x300?text=Queso+Mozzarella'},
-      {id:3, name:'Yogur Natural 500ml', price:25, img:'https://via.placeholder.com/400x300?text=Yogur+Natural'},
-      {id:4, name:'Mantequilla 250g', price:30, img:'https://via.placeholder.com/400x300?text=Mantequilla'},
-      {id:5, name:'Crema Pipia 200ml', price:28, img:'https://via.placeholder.com/400x300?text=Crema'}
-    ];
+<!-- Admin -->
+<div class="admin-modal" id="adminModal">
+  <div class="modal-content">
+    <button class="close-admin" id="closeAdmin">Cerrar</button>
+    <h2>Administración de Productos</h2>
 
-    const catalog = document.getElementById('catalog');
-    const cartBtn = document.getElementById('cartBtn');
-    const cartModal = document.getElementById('cartModal');
-    const closeCart = document.getElementById('closeCart');
-    const cartItemsContainer = document.getElementById('cartItems');
-    const cartTotalEl = document.getElementById('cartTotal');
+    <h3>Agregar Producto</h3>
+    <input type="text" id="adminName" placeholder="Nombre del producto">
+    <input type="number" id="adminPrice" placeholder="Precio">
+    <input type="file" id="adminImg">
+    <button id="addProductBtn">Agregar Producto</button>
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    <h3>Lista de Productos</h3>
+    <div id="adminProducts"></div>
+  </div>
+</div>
 
-    function renderCatalog() {
-      catalog.innerHTML = '';
-      products.forEach(p => {
-        const prodDiv = document.createElement('div');
-        prodDiv.classList.add('product');
-        prodDiv.innerHTML = `
-          <img src="${p.img}" alt="${p.name}">
-          <div class="product-body">
-            <h3>${p.name}</h3>
-            <p class="price">$${p.price}</p>
-            <button onclick="addToCart(${p.id})">Agregar al carrito</button>
-          </div>
-        `;
-        catalog.appendChild(prodDiv);
-      });
-    }
+<script>
+  const defaultProducts = [
+    {id:1, name:'Leche Entera Pipia 1L', price:20, img:''},
+    {id:2, name:'Queso Mozzarella 200g', price:45, img:''}
+  ];
 
-    function addToCart(id) {
-      const product = products.find(p => p.id === id);
-      const item = cart.find(i => i.id === id);
-      if(item) {
-        item.quantity += 1;
-      } else {
-        cart.push({...product, quantity:1});
-      }
-      localStorage.setItem('cart', JSON.stringify(cart));
-      alert(`${product.name} agregado al carrito`);
-    }
+  let products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    function renderCart() {
-      cartItemsContainer.innerHTML = '';
-      let total = 0;
-      cart.forEach(item => {
-        total += item.price * item.quantity;
-        const div = document.createElement('div');
-        div.classList.add('cart-item');
-        div.innerHTML = `
-          <span>${item.name} x ${item.quantity}</span>
-          <span>$${item.price * item.quantity}</span>
-        `;
-        cartItemsContainer.appendChild(div);
-      });
-      cartTotalEl.textContent = 'Total: $' + total;
-    }
+  const catalog = document.getElementById('catalog');
+  const cartBtn = document.getElementById('cartBtn');
+  const cartModal = document.getElementById('cartModal');
+  const closeCart = document.getElementById('closeCart');
+  const cartItemsContainer = document.getElementById('cartItems');
+  const cartTotalEl = document.getElementById('cartTotal');
+  const sendOrderBtn = document.getElementById('sendOrder');
 
-    cartBtn.addEventListener('click', () => {
-      renderCart();
-      cartModal.style.display = 'flex';
+  const adminBtn = document.getElementById('adminBtn');
+  const adminModal = document.getElementById('adminModal');
+  const closeAdmin = document.getElementById('closeAdmin');
+  const addProductBtn = document.getElementById('addProductBtn');
+  const adminProducts = document.getElementById('adminProducts');
+
+  const ADMIN_PASS = 'Pipia30';
+
+  function renderCatalog() {
+    catalog.innerHTML = '';
+    products.forEach(p => {
+      const prodDiv = document.createElement('div');
+      prodDiv.classList.add('product');
+      prodDiv.innerHTML = `
+        <img src="${p.img || 'https://via.placeholder.com/400x300?text=Producto'}" alt="${p.name}">
+        <div class="product-body">
+          <h3>${p.name}</h3>
+          <p class="price">$${p.price}</p>
+          <button onclick="addToCart(${p.id})">Agregar al carrito</button>
+        </div>
+      `;
+      catalog.appendChild(prodDiv);
     });
-    closeCart.addEventListener('click', () => cartModal.style.display = 'none');
+  }
 
-    window.onclick = function(event) {
-      if(event.target == cartModal) {
-        cartModal.style.display = 'none';
-      }
-    }
+  function addToCart(id) {
+    const product = products.find(p => p.id === id);
+    const item = cart.find(i => i.id === id);
+    if(item) item.quantity += 1;
+    else cart.push({...product, quantity:1});
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`${product.name} agregado al carrito`);
+  }
 
+  function renderCart() {
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      const div = document.createElement('div');
+      div.classList.add('cart-item');
+      div.innerHTML = `<span>${item.name} x ${item.quantity}</span><span>$${item.price*item.quantity}</span>`;
+      cartItemsContainer.appendChild(div);
+    });
+    cartTotalEl.textContent = 'Total: $' + total;
+  }
+
+  cartBtn.addEventListener('click', ()=>{ renderCart(); cartModal.style.display='flex'; });
+  closeCart.addEventListener('click', ()=>cartModal.style.display='none');
+
+  sendOrderBtn.addEventListener('click', ()=>{
+    if(cart.length===0){ alert('Tu carrito está vacío'); return; }
+    alert('Pedido enviado con éxito!');
+    cart=[]; localStorage.setItem('cart', JSON.stringify(cart));
+    renderCart();
+    cartModal.style.display='none';
+  });
+
+  window.onclick = (e)=>{
+    if(e.target==cartModal) cartModal.style.display='none';
+    if(e.target==adminModal) adminModal.style.display='none';
+  }
+
+  // Admin
+  adminBtn.addEventListener('click', ()=>{
+    const pass = prompt('Ingresa contraseña de administrador');
+    if(pass===ADMIN_PASS){
+      renderAdminProducts();
+      adminModal.style.display='flex';
+    } else alert('Contraseña incorrecta');
+  });
+  closeAdmin.addEventListener('click', ()=>adminModal.style.display='none');
+
+  function renderAdminProducts(){
+    adminProducts.innerHTML='';
+    products.forEach(p=>{
+      const div=document.createElement('div');
+      div.style.display='flex'; div.style.justifyContent='space-between'; div.style.marginBottom='8px';
+      div.innerHTML=`<span>${p.name} - $${p.price}</span> <button onclick="deleteProduct(${p.id})">Eliminar</button>`;
+      adminProducts.appendChild(div);
+    });
+  }
+
+  function deleteProduct(id){
+    products = products.filter(p=>p.id!==id);
+    localStorage.setItem('products', JSON.stringify(products));
     renderCatalog();
-  </script>
+    renderAdminProducts();
+  }
+
+  addProductBtn.addEventListener('click', ()=>{
+    const name = document.getElementById('adminName').value.trim();
+    const price = parseFloat(document.getElementById('adminPrice').value);
+    const imgFile = document.getElementById('adminImg').files[0];
+
+    if(!name || !price) return alert('Completa todos los campos');
+
+    if(imgFile){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        const imgData = e.target.result;
+        products.push({id:Date.now(), name, price, img:imgData});
+        localStorage.setItem('products', JSON.stringify(products));
+        renderCatalog(); renderAdminProducts();
+        document.getElementById('adminName').value=''; document.getElementById('adminPrice').value=''; document.getElementById('adminImg').value='';
+      }
+      reader.readAsDataURL(imgFile);
+    } else {
+      products.push({id:Date.now(), name, price, img:''});
+      localStorage.setItem('products', JSON.stringify(products));
+      renderCatalog(); renderAdminProducts();
+      document.getElementById('adminName').value=''; document.getElementById('adminPrice').value='';
+    }
+  });
+
+  renderCatalog();
+</script>
 </body>
 </html>
