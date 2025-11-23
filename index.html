@@ -28,10 +28,19 @@
       padding: 20px 0;
     }
 
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section h2 {
+      margin-bottom: 15px;
+      color: #555;
+    }
+
     .product-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+      gap: 15px;
     }
 
     .product {
@@ -44,7 +53,7 @@
 
     .product img {
       width: 100%;
-      height: 170px;
+      height: 150px;
       object-fit: cover;
       border-radius: 10px;
     }
@@ -68,17 +77,32 @@
       display: none;
     }
 
-    #cartBtn {
+    #adminLoginBtn {
       position: fixed;
       right: 20px;
       bottom: 20px;
-      padding: 15px 20px;
+      padding: 12px 18px;
       background: #ffc8d2;
       border-radius: 50px;
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0,0,0,0.2);
       border: none;
+      z-index: 1000;
+    }
+
+    #cartBtn {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      padding: 12px 18px;
+      background: #a4d6d3;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      border: none;
+      z-index: 1000;
     }
 
     #cartModal {
@@ -91,6 +115,7 @@
       display: none;
       justify-content: center;
       align-items: center;
+      z-index: 999;
     }
 
     #cartBox {
@@ -119,17 +144,31 @@
 <header>Pipia Catálogo</header>
 
 <div class="container">
+  <div class="section" id="section1">
+    <h2>Sección 1</h2>
+    <div class="product-grid" id="productList1"></div>
+  </div>
 
-  <h2>Productos</h2>
-  <div class="product-grid" id="productList"></div>
+  <div class="section" id="section2">
+    <h2>Sección 2</h2>
+    <div class="product-grid" id="productList2"></div>
+  </div>
 
-  <button id="adminLoginBtn">ADMIN</button>
+  <div class="section" id="section3">
+    <h2>Sección 3</h2>
+    <div class="product-grid" id="productList3"></div>
+  </div>
 
   <div id="adminPanel">
     <h3>Panel Administrador</h3>
 
     <input id="prodName" placeholder="Nombre" /> <br><br>
     <input id="prodPrice" placeholder="Precio" type="number" /> <br><br>
+    <select id="prodSection">
+      <option value="1">Sección 1</option>
+      <option value="2">Sección 2</option>
+      <option value="3">Sección 3</option>
+    </select><br><br>
     <input id="prodImg" type="file" /> <br><br>
     <button id="addProductBtn">Agregar Producto</button>
 
@@ -139,6 +178,7 @@
   </div>
 </div>
 
+<button id="adminLoginBtn">ADMIN</button>
 <button id="cartBtn">🛒 Carrito</button>
 
 <div id="cartModal">
@@ -159,15 +199,15 @@
   }
 
   function renderProducts() {
-    const list = document.getElementById("productList");
-    list.innerHTML = "";
+    ['productList1','productList2','productList3'].forEach(id => document.getElementById(id).innerHTML = '');
     products.forEach((p, i) => {
-      list.innerHTML += `
+      let sectionId = `productList${p.section}`;
+      document.getElementById(sectionId).innerHTML += `
         <div class='product'>
-          <img src="${p.img}" />
+          <img src='${p.img}' />
           <h4>${p.name}</h4>
           <p>Q${p.price}</p>
-          <button onclick="addToCart(${i})">Añadir</button>
+          <button onclick='addToCart(${i})'>Añadir</button>
         </div>
       `;
     });
@@ -179,7 +219,7 @@
     products.forEach((p, i) => {
       ap.innerHTML += `
         <div>
-          <b>${p.name}</b> Q${p.price}
+          <b>${p.name}</b> Q${p.price} - Sección ${p.section}
           <button onclick="delProd(${i})">Eliminar</button>
         </div>
       `;
@@ -202,12 +242,13 @@
     let name = document.getElementById("prodName").value;
     let price = document.getElementById("prodPrice").value;
     let imgFile = document.getElementById("prodImg").files[0];
+    let section = document.getElementById("prodSection").value;
 
     if (!name || !price || !imgFile) return alert("Completa todos los campos");
 
     let reader = new FileReader();
     reader.onload = () => {
-      products.push({ name, price, img: reader.result });
+      products.push({ name, price, img: reader.result, section });
       save();
       renderProducts();
       renderAdmin();
@@ -222,7 +263,6 @@
     renderAdmin();
   }
 
-  // CART
   document.getElementById("cartBtn").onclick = () => {
     document.getElementById("cartModal").style.display = "flex";
     let c = document.getElementById("cartItems");
