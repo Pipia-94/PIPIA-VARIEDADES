@@ -1,181 +1,202 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pipia Catálogo</title>
-  
-  <style>
-    body {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: #f8f4ec;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipia Yogurt - Catálogo</title>
 
-    header {
-      background: #ffc8d2;
-      padding: 20px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: 700;
-      color: #444;
-      border-bottom: 4px solid #e3a6b7;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
 
-    .container {
-      width: 90%;
-      margin: auto;
-      padding: 20px 0;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    background: #fdf5f2;
+    color: #333;
+  }
 
-    .section {
-      margin-bottom: 40px;
-    }
+  header {
+    background: #f9d6db;
+    padding: 25px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #4a4a4a;
+  }
 
-    .section h2 {
-      margin-bottom: 15px;
-      color: #555;
-    }
+  .section {
+    padding: 40px 5%;
+  }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
-      gap: 15px;
-    }
+  .section h2 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #7a5c61;
+  }
 
-    .product {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-    }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+  }
 
-    .product img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
+  .product {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
 
-    .product button {
-      margin-top: 10px;
-      padding: 10px 15px;
-      background: #a4d6d3;
-      border: none;
-      color: #333;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+  .product img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
 
-    #adminPanel {
-      background: #fff6f8;
-      padding: 20px;
-      margin-top: 30px;
-      border-radius: 14px;
-      display: none;
-    }
+  .product h4 {
+    margin: 10px 0 5px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+  }
 
-    #adminLoginBtn {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      padding: 12px 18px;
-      background: #ffc8d2;
-      border-radius: 50px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-      border: none;
-      z-index: 1000;
-    }
+  .product p {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 10px;
+  }
 
-    #cartBtn {
-      position: fixed;
-      right: 20px;
-      top: 20px;
-      padding: 12px 18px;
-      background: #a4d6d3;
-      border-radius: 50px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-      border: none;
-      z-index: 1000;
-    }
+  .product button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #a4d6d3;
+    color: #333;
+    font-weight: 600;
+    cursor: pointer;
+  }
 
-    #cartModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
+  #adminPanel {
+    display: none;
+    background: #fff0f3;
+    padding: 20px;
+    margin: 40px 5%;
+    border-radius: 14px;
+  }
 
-    #cartBox {
-      background: white;
-      width: 90%;
-      max-width: 450px;
-      padding: 20px;
-      border-radius: 15px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
+  #adminLoginBtn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: #f9d6db;
+    padding: 14px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    z-index: 1000;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  }
 
-    #sendBtn {
-      width: 100%;
-      background: #a4d6d3;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+  #cartBtn {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    background: #a4d6d3;
+    padding: 14px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    z-index: 1000;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  }
+
+  #cartModal {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+
+  #cartBox {
+    background: #fff;
+    width: 90%;
+    max-width: 450px;
+    padding: 20px;
+    border-radius: 15px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  #sendBtn {
+    width: 100%;
+    background: #a4d6d3;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  input, select {
+    padding: 8px;
+    width: 90%;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-<header>Pipia Catálogo</header>
+<header>Pipia Yogurt</header>
 
-<div class="container">
-  <div class="section" id="section1">
-    <h2>Sección 1</h2>
-    <div class="product-grid" id="productList1"></div>
-  </div>
+<div class="section" id="section1">
+  <h2>Sección 1</h2>
+  <div class="product-grid" id="productList1"></div>
+</div>
 
-  <div class="section" id="section2">
-    <h2>Sección 2</h2>
-    <div class="product-grid" id="productList2"></div>
-  </div>
+<div class="section" id="section2">
+  <h2>Sección 2</h2>
+  <div class="product-grid" id="productList2"></div>
+</div>
 
-  <div class="section" id="section3">
-    <h2>Sección 3</h2>
-    <div class="product-grid" id="productList3"></div>
-  </div>
+<div class="section" id="section3">
+  <h2>Sección 3</h2>
+  <div class="product-grid" id="productList3"></div>
+</div>
 
-  <div id="adminPanel">
-    <h3>Panel Administrador</h3>
+<div id="adminPanel">
+  <h3>Panel Administrador</h3>
+  <input id="prodName" placeholder="Nombre Producto" />
+  <input id="prodPrice" placeholder="Precio" type="number" />
+  <select id="prodSection">
+    <option value="1">Sección 1</option>
+    <option value="2">Sección 2</option>
+    <option value="3">Sección 3</option>
+  </select>
+  <input id="prodImg" type="file" />
+  <button id="addProductBtn">Agregar Producto</button>
 
-    <input id="prodName" placeholder="Nombre" /> <br><br>
-    <input id="prodPrice" placeholder="Precio" type="number" /> <br><br>
-    <select id="prodSection">
-      <option value="1">Sección 1</option>
-      <option value="2">Sección 2</option>
-      <option value="3">Sección 3</option>
-    </select><br><br>
-    <input id="prodImg" type="file" /> <br><br>
-    <button id="addProductBtn">Agregar Producto</button>
-
-    <hr>
-    <h3>Productos Existentes</h3>
-    <div id="adminProducts"></div>
-  </div>
+  <hr>
+  <h3>Productos Existentes</h3>
+  <div id="adminProducts"></div>
 </div>
 
 <button id="adminLoginBtn">ADMIN</button>
@@ -190,96 +211,90 @@
 </div>
 
 <script>
-  let adminPass = "Pipia30";
-  let products = JSON.parse(localStorage.getItem("products")) || [];
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let adminPass = "Pipia30";
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  function save() {
-    localStorage.setItem("products", JSON.stringify(products));
-  }
+function save() {
+  localStorage.setItem("products", JSON.stringify(products));
+}
 
-  function renderProducts() {
-    ['productList1','productList2','productList3'].forEach(id => document.getElementById(id).innerHTML = '');
-    products.forEach((p, i) => {
-      let sectionId = `productList${p.section}`;
-      document.getElementById(sectionId).innerHTML += `
-        <div class='product'>
-          <img src='${p.img}' />
-          <h4>${p.name}</h4>
-          <p>Q${p.price}</p>
-          <button onclick='addToCart(${i})'>Añadir</button>
-        </div>
-      `;
-    });
-  }
+function renderProducts() {
+  ['productList1','productList2','productList3'].forEach(id => document.getElementById(id).innerHTML='');
+  products.forEach((p,i)=>{
+    let sectionId = 'productList'+p.section;
+    document.getElementById(sectionId).innerHTML += `
+      <div class='product'>
+        <img src='${p.img}' />
+        <h4>${p.name}</h4>
+        <p>Q${p.price}</p>
+        <button onclick='addToCart(${i})'>Añadir</button>
+      </div>
+    `;
+  });
+}
 
-  function renderAdmin() {
-    const ap = document.getElementById("adminProducts");
-    ap.innerHTML = "";
-    products.forEach((p, i) => {
-      ap.innerHTML += `
-        <div>
-          <b>${p.name}</b> Q${p.price} - Sección ${p.section}
-          <button onclick="delProd(${i})">Eliminar</button>
-        </div>
-      `;
-    });
-  }
+function renderAdmin(){
+  const ap=document.getElementById('adminProducts');
+  ap.innerHTML='';
+  products.forEach((p,i)=>{
+    ap.innerHTML += `<div><b>${p.name}</b> Q${p.price} - Sección ${p.section} <button onclick='delProd(${i})'>Eliminar</button></div>`;
+  });
+}
 
-  function addToCart(i) {
-    cart.push(products[i]);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Añadido al carrito!");
-  }
+function addToCart(i){
+  cart.push(products[i]);
+  localStorage.setItem('cart',JSON.stringify(cart));
+  alert('Añadido al carrito!');
+}
 
-  document.getElementById("adminLoginBtn").onclick = () => {
-    let p = prompt("Contraseña administrador:");
-    if (p === adminPass) document.getElementById("adminPanel").style.display = "block";
-    else alert("Incorrecto");
-  };
+document.getElementById('adminLoginBtn').onclick = ()=>{
+  let p=prompt('Contraseña administrador:');
+  if(p===adminPass) document.getElementById('adminPanel').style.display='block';
+  else alert('Incorrecto');
+};
 
-  document.getElementById("addProductBtn").onclick = () => {
-    let name = document.getElementById("prodName").value;
-    let price = document.getElementById("prodPrice").value;
-    let imgFile = document.getElementById("prodImg").files[0];
-    let section = document.getElementById("prodSection").value;
-
-    if (!name || !price || !imgFile) return alert("Completa todos los campos");
-
-    let reader = new FileReader();
-    reader.onload = () => {
-      products.push({ name, price, img: reader.result, section });
-      save();
-      renderProducts();
-      renderAdmin();
-    };
-    reader.readAsDataURL(imgFile);
-  };
-
-  function delProd(i) {
-    products.splice(i, 1);
+document.getElementById('addProductBtn').onclick = ()=>{
+  let name=document.getElementById('prodName').value;
+  let price=document.getElementById('prodPrice').value;
+  let imgFile=document.getElementById('prodImg').files[0];
+  let section=parseInt(document.getElementById('prodSection').value);
+  if(!name||!price||!imgFile) return alert('Completa todos los campos');
+  let reader=new FileReader();
+  reader.onload=()=>{
+    products.push({name,price,img:reader.result,section});
     save();
     renderProducts();
     renderAdmin();
-  }
-
-  document.getElementById("cartBtn").onclick = () => {
-    document.getElementById("cartModal").style.display = "flex";
-    let c = document.getElementById("cartItems");
-    c.innerHTML = cart.map(p => `<p>${p.name} - Q${p.price}</p>`).join("");
+    document.getElementById('prodName').value='';
+    document.getElementById('prodPrice').value='';
+    document.getElementById('prodImg').value=null;
+    document.getElementById('prodSection').value='1';
   };
+  reader.readAsDataURL(imgFile);
+};
 
-  document.getElementById("sendBtn").onclick = () => {
-    let text = cart.map(p => `${p.name} Q${p.price}`).join("%0A");
-    window.open(`https://wa.me/50256320811?text=Mi%20pedido:%0A${text}`);
-  };
-
-  document.getElementById("cartModal").onclick = (e) => {
-    if (e.target.id === "cartModal") e.target.style.display = "none";
-  };
-
+function delProd(i){
+  products.splice(i,1);
+  save();
   renderProducts();
   renderAdmin();
+}
+
+document.getElementById('cartBtn').onclick=()=>{
+  document.getElementById('cartModal').style.display='flex';
+  document.getElementById('cartItems').innerHTML = cart.map(p=>`<p>${p.name} - Q${p.price}</p>`).join('');
+};
+
+document.getElementById('sendBtn').onclick=()=>{
+  let text=cart.map(p=>`${p.name} Q${p.price}`).join('%0A');
+  window.open(`https://wa.me/50256320811?text=Mi%20pedido:%0A${text}`);
+};
+
+document.getElementById('cartModal').onclick=(e)=>{if(e.target.id==='cartModal') e.target.style.display='none';};
+
+renderProducts();
+renderAdmin();
 </script>
 
 </body>
