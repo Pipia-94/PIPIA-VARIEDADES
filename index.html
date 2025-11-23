@@ -9,7 +9,7 @@
   body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background: #f6f6f6;
+    background: #f2f2f2;
   }
   h1 { text-align: center; }
 
@@ -18,11 +18,11 @@
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 10px;
-    box-shadow: 0 0 5px #ccc;
+    box-shadow: 0 0 5px #aaa;
   }
 
   .cart {
-    background: #fff4c2;
+    background: #fff2c6;
     padding: 15px;
     border-radius: 10px;
     margin-top: 20px;
@@ -31,7 +31,7 @@
   button {
     padding: 10px;
     border: none;
-    background: #008cff;
+    background: #0074ff;
     color: white;
     border-radius: 6px;
     cursor: pointer;
@@ -62,16 +62,16 @@
   <input id="pName" placeholder="Nombre"><br><br>
   <input id="pPrice" type="number" placeholder="Precio"><br><br>
   <input id="pImg" type="file"><br><br>
-  <button onclick="addProduct()">Agregar</button>
+  <button onclick="addProduct()">Agregar producto</button>
 </div>
 
 <script>
-// ===== Utilidades localStorage =====
+// =================== LOCALSTORAGE ===================
 function load(key, fallback) {
-  try { 
+  try {
     const val = JSON.parse(localStorage.getItem(key));
     return val !== null ? val : fallback;
-  } catch(e) {
+  } catch {
     return fallback;
   }
 }
@@ -80,14 +80,19 @@ function save(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-// ===== Datos iniciales =====
+// =================== DATA ===================
 let products = load("products", []);
 let cart = load("cart", []);
 
-// ===== Mostrar catálogo =====
+// =================== CATÁLOGO ===================
 function renderCatalog() {
   const div = document.getElementById("catalog");
   div.innerHTML = "";
+
+  if (products.length === 0) {
+    div.innerHTML = "<em>No hay productos aún.</em>";
+    return;
+  }
 
   products.forEach((p, i) => {
     const box = document.createElement("div");
@@ -102,9 +107,10 @@ function renderCatalog() {
   });
 }
 
-// ===== Carrito =====
+// =================== CARRITO ===================
 function renderCart() {
   const div = document.getElementById("cart");
+
   if (cart.length === 0) {
     div.innerHTML = "<em>Carrito vacío</em>";
     return;
@@ -139,7 +145,7 @@ function removeCart(i) {
   renderCart();
 }
 
-// ===== Admin =====
+// =================== ADMIN ===================
 function loginAdmin() {
   const pass = document.getElementById("adminPass").value;
   if (pass === "1234") {
@@ -153,23 +159,28 @@ function addProduct() {
   const name = document.getElementById("pName").value;
   const price = document.getElementById("pPrice").value;
   const file = document.getElementById("pImg").files[0];
-
-  if (!name || !price || !file) return alert("Faltan datos");
+  
+  if (!name || !price || !file) return alert("Completa todos los campos");
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    products.push({ name, price, img: e.target.result });
+    products.push({
+      name,
+      price,
+      img: e.target.result
+    });
     save("products", products);
     renderCatalog();
-    alert("Producto agregado.");
+    alert("Producto agregado");
   };
 
   reader.readAsDataURL(file);
 }
 
-// ===== Inicial =====
+// =================== INICIAL ===================
 renderCatalog();
 renderCart();
+
 </script>
 
 </body>
