@@ -1,65 +1,246 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catálogo PipiA Yogurt</title>
+  <title>Pipia Catálogo</title>
+  
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      background: #fafafa;
+      font-family: "Poppins", sans-serif;
+      background: #f8f4ec;
     }
+
     header {
-      background: #ff4fb3;
-      color: #fff;
+      background: #ffc8d2;
       padding: 20px;
       text-align: center;
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 28px;
+      font-weight: 700;
+      color: #444;
+      border-bottom: 4px solid #e3a6b7;
     }
+
     .container {
-      max-width: 900px;
+      width: 90%;
       margin: auto;
-      padding: 20px;
+      padding: 20px 0;
     }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
     .product {
-      background: #fff;
-      border-radius: 15px;
+      background: white;
       padding: 15px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      display: flex;
-      gap: 15px;
-    }
-    .product img {
-      width: 140px;
-      height: 140px;
       border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      height: 170px;
       object-fit: cover;
-    }
-    .product button {
-      background: #ff4fb3;
-      border: none;
-      padding: 10px 15px;
       border-radius: 10px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
+    }
+
+    .product button {
       margin-top: 10px;
-    }
-    #carritoBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #4caf50;
-      color: #fff;
-      padding: 15px 20px;
-      border-radius: 50px;
+      padding: 10px 15px;
+      background: #a4d6d3;
+      border: none;
+      color: #333;
+      font-weight: 600;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
+
     #adminPanel {
-      margin-top: 40px;
+      background: #fff6f8;
       padding: 20px;
-      background: #ffe3f3;
+      margin-top: 30px;
+      border-radius: 14px;
+      display: none;
+    }
+
+    #cartBtn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 15px 20px;
+      background: #ffc8d2;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      border: none;
+    }
+
+    #cartModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #cartBox {
+      background: white;
+      width: 90%;
+      max-width: 450px;
+      padding: 20px;
+      border-radius: 15px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    #sendBtn {
+      width: 100%;
+      background: #a4d6d3;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>Pipia Catálogo</header>
+
+<div class="container">
+
+  <h2>Productos</h2>
+  <div class="product-grid" id="productList"></div>
+
+  <button id="adminLoginBtn">ADMIN</button>
+
+  <div id="adminPanel">
+    <h3>Panel Administrador</h3>
+
+    <input id="prodName" placeholder="Nombre" /> <br><br>
+    <input id="prodPrice" placeholder="Precio" type="number" /> <br><br>
+    <input id="prodImg" type="file" /> <br><br>
+    <button id="addProductBtn">Agregar Producto</button>
+
+    <hr>
+    <h3>Productos Existentes</h3>
+    <div id="adminProducts"></div>
+  </div>
+</div>
+
+<button id="cartBtn">🛒 Carrito</button>
+
+<div id="cartModal">
+  <div id="cartBox">
+    <h3>Tu Carrito</h3>
+    <div id="cartItems"></div>
+    <button id="sendBtn">Enviar a WhatsApp</button>
+  </div>
+</div>
+
+<script>
+  let adminPass = "Pipia30";
+  let products = JSON.parse(localStorage.getItem("products")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  function save() {
+    localStorage.setItem("products", JSON.stringify(products));
+  }
+
+  function renderProducts() {
+    const list = document.getElementById("productList");
+    list.innerHTML = "";
+    products.forEach((p, i) => {
+      list.innerHTML += `
+        <div class='product'>
+          <img src="${p.img}" />
+          <h4>${p.name}</h4>
+          <p>Q${p.price}</p>
+          <button onclick="addToCart(${i})">Añadir</button>
+        </div>
+      `;
+    });
+  }
+
+  function renderAdmin() {
+    const ap = document.getElementById("adminProducts");
+    ap.innerHTML = "";
+    products.forEach((p, i) => {
+      ap.innerHTML += `
+        <div>
+          <b>${p.name}</b> Q${p.price}
+          <button onclick="delProd(${i})">Eliminar</button>
+        </div>
+      `;
+    });
+  }
+
+  function addToCart(i) {
+    cart.push(products[i]);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("Añadido al carrito!");
+  }
+
+  document.getElementById("adminLoginBtn").onclick = () => {
+    let p = prompt("Contraseña administrador:");
+    if (p === adminPass) document.getElementById("adminPanel").style.display = "block";
+    else alert("Incorrecto");
+  };
+
+  document.getElementById("addProductBtn").onclick = () => {
+    let name = document.getElementById("prodName").value;
+    let price = document.getElementById("prodPrice").value;
+    let imgFile = document.getElementById("prodImg").files[0];
+
+    if (!name || !price || !imgFile) return alert("Completa todos los campos");
+
+    let reader = new FileReader();
+    reader.onload = () => {
+      products.push({ name, price, img: reader.result });
+      save();
+      renderProducts();
+      renderAdmin();
+    };
+    reader.readAsDataURL(imgFile);
+  };
+
+  function delProd(i) {
+    products.splice(i, 1);
+    save();
+    renderProducts();
+    renderAdmin();
+  }
+
+  // CART
+  document.getElementById("cartBtn").onclick = () => {
+    document.getElementById("cartModal").style.display = "flex";
+    let c = document.getElementById("cartItems");
+    c.innerHTML = cart.map(p => `<p>${p.name} - Q${p.price}</p>`).join("");
+  };
+
+  document.getElementById("sendBtn").onclick = () => {
+    let text = cart.map(p => `${p.name} Q${p.price}`).join("%0A");
+    window.open(`https://wa.me/50256320811?text=Mi%20pedido:%0A${text}`);
+  };
+
+  document.getElementById("cartModal").onclick = (e) => {
+    if (e.target.id === "cartModal") e.target.style.display = "none";
+  };
+
+  renderProducts();
+  renderAdmin();
+</script>
+
+</body>
+</html>
