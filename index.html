@@ -1,122 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pipia - Catálogo</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: "Poppins", sans-serif;
-            background: #f6f1e9; /* crema */
-            color: #3a3a3a;
-        }
-
-        .header {
-            text-align: center;
-            padding: 20px;
-            background: #e9dbc8; /* nude */
-            border-bottom: 3px solid #d0bfae;
-        }
-
-        .logo {
-            width: 150px;
-            margin-bottom: 10px;
-        }
-
-        .catalogo {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            padding: 15px;
-            text-align: center;
-        }
-
-        .card img {
-            width: 100%;
-            border-radius: 10px;
-        }
-
-        .btn-wsp {
-            background: #25D366;
-            padding: 12px;
-            width: 100%;
-            border-radius: 8px;
-            color: white;
-            text-decoration: none;
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .btn-wsp:hover {
-            background: #1ebe5d;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 15px;
-            background: #e9dbc8;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nueva Venta</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; margin-bottom: 20px; }
+    form { display: flex; flex-direction: column; }
+    label { margin-top: 10px; }
+    input, textarea { padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 20px; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+  </style>
 </head>
-
 <body>
-    <header class="header">
-        <img src="logo.png" alt="Pipia Logo" class="logo" />
-        <h1>Pipia Catálogo</h1>
-    </header>
+  <div class="container">
+    <h1>Registrar Nueva Venta</h1>
+    <form id="ventaForm">
+      <label for="nombre">Nombre del cliente:</label>
+      <input type="text" id="nombre" name="nombre" required />
 
-    <main class="catalogo" id="catalogo"></main>
+      <label for="producto">Producto:</label>
+      <input type="text" id="producto" name="producto" required />
 
-    <footer class="footer">
-        <p>© 2025 Pipia</p>
-    </footer>
+      <label for="cantidad">Cantidad:</label>
+      <input type="number" id="cantidad" name="cantidad" required />
 
-<script>
-    // EDITA TUS PRODUCTOS AQUÍ — solo cambia nombre, precio e imagen
-    const productos = [
-        {
-            nombre: "Collar Bella",
-            precio: 85,
-            imagen: "producto1.jpg"
-        },
-        {
-            nombre: "Pulsera Dorada",
-            precio: 65,
-            imagen: "producto2.jpg"
-        }
-    ];
+      <label for="monto">Monto:</label>
+      <input type="number" id="monto" name="monto" step="0.01" required />
 
-    const catalogo = document.getElementById("catalogo");
+      <label for="notas">Notas adicionales:</label>
+      <textarea id="notas" name="notas" rows="4"></textarea>
 
-    productos.forEach(p => {
-        const card = document.createElement("div");
-        card.classList.add("card");
+      <button type="submit">Enviar Venta</button>
+    </form>
 
-        card.innerHTML = `
-            <img src="${p.imagen}" alt="${p.nombre}">
-            <h3>${p.nombre}</h3>
-            <p>Q${p.precio}</p>
-            <a class="btn-wsp" 
-                href="https://wa.me/50256320811?text=Hola,%20quiero%20hacer%20un%20pedido:%20${encodeURIComponent(p.nombre)}%20-%20Q${p.precio}"
-                target="_blank">
-                Enviar Pedido
-            </a>
-        `;
+    <div id="mensaje" style="display:none; margin-top:20px; color: green;">Venta registrada con éxito.</div>
+  </div>
 
-        catalogo.appendChild(card);
+  <script>
+    document.getElementById('ventaForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Aquí puedes hacer lo que quieras con los datos: enviarlos a un servicio externo
+      const data = {
+        nombre: e.target.nombre.value,
+        producto: e.target.producto.value,
+        cantidad: e.target.cantidad.value,
+        monto: e.target.monto.value,
+        notas: e.target.notas.value
+      };
+      console.log("Datos venta:", data);
+
+      // Ejemplo: solo mostrar mensaje
+      document.getElementById('mensaje').style.display = 'block';
+
+      // Si tuvieras un backend HTTP podrías hacer un fetch POST:
+      /*
+      fetch('https://tu-endpoint.com/api/ventas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(resp => {
+        document.getElementById('mensaje').textContent = 'Venta registrada correctamente!';
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('mensaje').textContent = 'Error al registrar la venta.';
+        document.getElementById('mensaje').style.color = 'red';
+      });
+      */
     });
-</script>
-
+  </script>
 </body>
 </html>
