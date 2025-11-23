@@ -1,48 +1,160 @@
-// Actualizar número en el icono del carrito
-function updateCartCount() {
-    const count = cart.length;
-    document.getElementById('cartBtn').textContent = `🛒 Carrito (${count})`;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipia Yogurt - Catálogo</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body { margin:0; font-family:'Quicksand',sans-serif; background:#fdf5f2; color:#333; }
+header { background:#f9d6db; padding:25px; text-align:center; font-size:32px; font-weight:700; color:#4a4a4a; }
+.section { padding:40px 5%; }
+.section h2 { font-size:26px; font-weight:600; margin-bottom:25px; color:#7a5c61; }
+.product-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:20px; }
+.product { background:#fff; border-radius:12px; padding:12px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+.product img { width:100%; height:130px; object-fit:cover; border-radius:10px; }
+.product h4 { margin:10px 0 5px; font-size:16px; font-weight:500; color:#555; }
+.product p { font-size:14px; color:#777; margin-bottom:10px; }
+.product button { padding:8px 12px; border:none; border-radius:8px; background:#a4d6d3; color:#333; font-weight:600; cursor:pointer; }
+#adminPanel { display:none; background:#fff0f3; padding:20px; margin:40px 5%; border-radius:14px; }
+#adminLoginBtn { position:fixed; right:20px; bottom:20px; background:#f9d6db; padding:14px 20px; border-radius:50px; font-weight:700; cursor:pointer; border:none; z-index:1000; box-shadow:0 3px 8px rgba(0,0,0,0.2); }
+#cartBtn { position:fixed; right:20px; top:20px; background:#a4d6d3; padding:14px 20px; border-radius:50px; font-weight:700; cursor:pointer; border:none; z-index:1000; box-shadow:0 3px 8px rgba(0,0,0,0.2); }
+#cartModal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); display:none; justify-content:center; align-items:center; z-index:999; }
+#cartBox { background:#fff; width:90%; max-width:450px; padding:20px; border-radius:15px; max-height:80vh; overflow-y:auto; }
+#sendBtn { width:100%; background:#a4d6d3; padding:12px; border-radius:10px; border:none; font-weight:bold; cursor:pointer; margin-top:10px; }
+input, select { padding:8px; width:90%; margin-bottom:10px; border-radius:6px; border:1px solid #ccc; font-size:14px; }
+</style>
+</head>
+<body>
+<header>Pipia Yogurt</header>
+
+<div class="section" id="section1">
+  <h2>Sección 1</h2>
+  <div class="product-grid" id="productList1"></div>
+</div>
+<div class="section" id="section2">
+  <h2>Sección 2</h2>
+  <div class="product-grid" id="productList2"></div>
+</div>
+<div class="section" id="section3">
+  <h2>Sección 3</h2>
+  <div class="product-grid" id="productList3"></div>
+</div>
+
+<div id="adminPanel">
+  <h3>Panel Administrador</h3>
+  <input id="prodName" placeholder="Nombre Producto" />
+  <input id="prodPrice" placeholder="Precio" type="number" />
+  <select id="prodSection">
+    <option value="1">Sección 1</option>
+    <option value="2">Sección 2</option>
+    <option value="3">Sección 3</option>
+  </select>
+  <input id="prodImg" type="file" />
+  <button id="addProductBtn" type="button">Agregar Producto</button>
+  <hr>
+  <h3>Productos Existentes</h3>
+  <div id="adminProducts"></div>
+</div>
+
+<button id="adminLoginBtn">ADMIN</button>
+<button id="cartBtn">🛒 Carrito (0)</button>
+
+<div id="cartModal">
+  <div id="cartBox">
+    <h3>Tu Carrito</h3>
+    <div id="cartItems"></div>
+    <button id="sendBtn">Enviar a WhatsApp</button>
+  </div>
+</div>
+
+<script>
+let adminPass = 'Pipia30';
+let products = JSON.parse(localStorage.getItem('products')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function save(){ localStorage.setItem('products', JSON.stringify(products)); }
+
+function updateCartCount(){ document.getElementById('cartBtn').textContent = `🛒 Carrito (${cart.length})`; }
+
+function renderProducts(){
+  ['productList1','productList2','productList3'].forEach(id => document.getElementById(id).innerHTML='');
+  products.forEach((p,i)=>{
+    let sectionId = 'productList'+p.section;
+    document.getElementById(sectionId).innerHTML += `<div class='product'><img src='${p.img}'/><h4>${p.name}</h4><p>Q${p.price}</p><button onclick='addToCart(${i})'>Añadir</button></div>`;
+  });
 }
 
-// Agregar al carrito
+function renderAdmin(){
+  const ap = document.getElementById('adminProducts');
+  ap.innerHTML='';
+  products.forEach((p,i)=>{
+    ap.innerHTML += `<div><b>${p.name}</b> Q${p.price} - Sección ${p.section} <button onclick='delProd(${i})'>Eliminar</button></div>`;
+  });
+}
+
 function addToCart(i){
-    cart.push(products[i]);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCount();
-    alert('Añadido al carrito!');
+  cart.push(products[i]);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  renderCart();
 }
 
-// Quitar del carrito
 function removeFromCart(i){
-    cart.splice(i,1);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    renderCart();
-    updateCartCount();
+  cart.splice(i,1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderCart();
+  updateCartCount();
 }
 
-// Mostrar carrito
 function renderCart(){
-    const cartDiv = document.getElementById('cartItems');
-    if(cart.length === 0){
-        cartDiv.innerHTML = '<p>El carrito está vacío.</p>';
-    } else {
-        cartDiv.innerHTML = '';
-        cart.forEach((p,i)=>{
-            const item = document.createElement('div');
-            item.style.display = 'flex';
-            item.style.justifyContent = 'space-between';
-            item.style.marginBottom = '8px';
-            item.innerHTML = `<span>${p.name} - Q${p.price}</span> <button onclick="removeFromCart(${i})">❌</button>`;
-            cartDiv.appendChild(item);
-        });
-    }
+  const cartDiv = document.getElementById('cartItems');
+  if(cart.length===0){ cartDiv.innerHTML='<p>El carrito está vacío.</p>'; }
+  else{
+    cartDiv.innerHTML='';
+    cart.forEach((p,i)=>{
+      const item=document.createElement('div');
+      item.style.display='flex';
+      item.style.justifyContent='space-between';
+      item.style.marginBottom='8px';
+      item.innerHTML=`<span>${p.name} - Q${p.price}</span> <button onclick='removeFromCart(${i})'>❌</button>`;
+      cartDiv.appendChild(item);
+    });
+  }
 }
 
-// Abrir carrito
-document.getElementById('cartBtn').onclick = () => {
-    document.getElementById('cartModal').style.display='flex';
-    renderCart();
+document.getElementById('adminLoginBtn').onclick = ()=>{
+  let p=prompt('Contraseña administrador:');
+  if(p===adminPass) document.getElementById('adminPanel').style.display='block';
+  else alert('Incorrecto');
 };
 
-// Inicializar contador al cargar la página
-updateCartCount();
+document.getElementById('addProductBtn').onclick = ()=>{
+  let name=document.getElementById('prodName').value.trim();
+  let price=document.getElementById('prodPrice').value.trim();
+  let imgFile=document.getElementById('prodImg').files[0];
+  let section=parseInt(document.getElementById('prodSection').value);
+  if(!name||!price||!imgFile) return alert('Completa todos los campos');
+  let reader=new FileReader();
+  reader.onload=()=>{
+    products.push({name,price,img:reader.result,section});
+    save(); renderProducts(); renderAdmin();
+    document.getElementById('prodName').value='';
+    document.getElementById('prodPrice').value='';
+    document.getElementById('prodImg').value=null;
+    document.getElementById('prodSection').value='1';
+  };
+  reader.readAsDataURL(imgFile);
+};
+
+document.getElementById('cartBtn').onclick=()=>{ document.getElementById('cartModal').style.display='flex'; renderCart(); };
+document.getElementById('sendBtn').onclick=()=>{
+  let text=cart.map(p=>`${p.name} Q${p.price}`).join('%0A');
+  window.open(`https://wa.me/50256320811?text=Mi%20pedido:%0A${text}`);
+};
+document.getElementById('cartModal').onclick=(e)=>{ if(e.target.id==='cartModal') e.target.style.display='none'; };
+
+updateCartCount(); renderProducts(); renderAdmin();
+</script>
+</body>
+</html>
