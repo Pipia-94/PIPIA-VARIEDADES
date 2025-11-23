@@ -1,79 +1,225 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nueva Venta</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lácteos Pipia - Catálogo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; margin-bottom: 20px; }
-    form { display: flex; flex-direction: column; }
-    label { margin-top: 10px; }
-    input, textarea { padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
-    button { margin-top: 20px; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #0056b3; }
+    body {
+      margin: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: #f6f1e9;
+      color: #333;
+    }
+    header {
+      background: #ffdd57;
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #222;
+    }
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .product {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s;
+    }
+    .product:hover {
+      transform: scale(1.03);
+    }
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .product-body {
+      padding: 15px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-body h3 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+    }
+    .product-body p {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+    .product-body .price {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .product-body button {
+      padding: 10px;
+      background: #ff7f50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .product-body button:hover {
+      background: #ff6333;
+    }
+    .cart-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff7f50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 100;
+    }
+    .cart-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+    }
+    .cart-content {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .close-cart {
+      background: #ff7f50;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      float: right;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Registrar Nueva Venta</h1>
-    <form id="ventaForm">
-      <label for="nombre">Nombre del cliente:</label>
-      <input type="text" id="nombre" name="nombre" required />
+  <header>Lácteos Pipia</header>
 
-      <label for="producto">Producto:</label>
-      <input type="text" id="producto" name="producto" required />
+  <button class="cart-button" id="cartBtn">🛒</button>
 
-      <label for="cantidad">Cantidad:</label>
-      <input type="number" id="cantidad" name="cantidad" required />
+  <div class="catalog" id="catalog"></div>
 
-      <label for="monto">Monto:</label>
-      <input type="number" id="monto" name="monto" step="0.01" required />
-
-      <label for="notas">Notas adicionales:</label>
-      <textarea id="notas" name="notas" rows="4"></textarea>
-
-      <button type="submit">Enviar Venta</button>
-    </form>
-
-    <div id="mensaje" style="display:none; margin-top:20px; color: green;">Venta registrada con éxito.</div>
+  <div class="cart-modal" id="cartModal">
+    <div class="cart-content">
+      <button class="close-cart" id="closeCart">Cerrar</button>
+      <h2>Tu carrito</h2>
+      <div id="cartItems"></div>
+      <h3 id="cartTotal">Total: $0</h3>
+    </div>
   </div>
 
   <script>
-    document.getElementById('ventaForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Aquí puedes hacer lo que quieras con los datos: enviarlos a un servicio externo
-      const data = {
-        nombre: e.target.nombre.value,
-        producto: e.target.producto.value,
-        cantidad: e.target.cantidad.value,
-        monto: e.target.monto.value,
-        notas: e.target.notas.value
-      };
-      console.log("Datos venta:", data);
+    const products = [
+      {id:1, name:'Leche Entera Pipia 1L', price:20, img:'https://via.placeholder.com/400x300?text=Leche+Entera'},
+      {id:2, name:'Queso Mozzarella 200g', price:45, img:'https://via.placeholder.com/400x300?text=Queso+Mozzarella'},
+      {id:3, name:'Yogur Natural 500ml', price:25, img:'https://via.placeholder.com/400x300?text=Yogur+Natural'},
+      {id:4, name:'Mantequilla 250g', price:30, img:'https://via.placeholder.com/400x300?text=Mantequilla'},
+      {id:5, name:'Crema Pipia 200ml', price:28, img:'https://via.placeholder.com/400x300?text=Crema'}
+    ];
 
-      // Ejemplo: solo mostrar mensaje
-      document.getElementById('mensaje').style.display = 'block';
+    const catalog = document.getElementById('catalog');
+    const cartBtn = document.getElementById('cartBtn');
+    const cartModal = document.getElementById('cartModal');
+    const closeCart = document.getElementById('closeCart');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
 
-      // Si tuvieras un backend HTTP podrías hacer un fetch POST:
-      /*
-      fetch('https://tu-endpoint.com/api/ventas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(resp => {
-        document.getElementById('mensaje').textContent = 'Venta registrada correctamente!';
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('mensaje').textContent = 'Error al registrar la venta.';
-        document.getElementById('mensaje').style.color = 'red';
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function renderCatalog() {
+      catalog.innerHTML = '';
+      products.forEach(p => {
+        const prodDiv = document.createElement('div');
+        prodDiv.classList.add('product');
+        prodDiv.innerHTML = `
+          <img src="${p.img}" alt="${p.name}">
+          <div class="product-body">
+            <h3>${p.name}</h3>
+            <p class="price">$${p.price}</p>
+            <button onclick="addToCart(${p.id})">Agregar al carrito</button>
+          </div>
+        `;
+        catalog.appendChild(prodDiv);
       });
-      */
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const item = cart.find(i => i.id === id);
+      if(item) {
+        item.quantity += 1;
+      } else {
+        cart.push({...product, quantity:1});
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(`${product.name} agregado al carrito`);
+    }
+
+    function renderCart() {
+      cartItemsContainer.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        const div = document.createElement('div');
+        div.classList.add('cart-item');
+        div.innerHTML = `
+          <span>${item.name} x ${item.quantity}</span>
+          <span>$${item.price * item.quantity}</span>
+        `;
+        cartItemsContainer.appendChild(div);
+      });
+      cartTotalEl.textContent = 'Total: $' + total;
+    }
+
+    cartBtn.addEventListener('click', () => {
+      renderCart();
+      cartModal.style.display = 'flex';
     });
+    closeCart.addEventListener('click', () => cartModal.style.display = 'none');
+
+    window.onclick = function(event) {
+      if(event.target == cartModal) {
+        cartModal.style.display = 'none';
+      }
+    }
+
+    renderCatalog();
   </script>
 </body>
 </html>
