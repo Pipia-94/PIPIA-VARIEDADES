@@ -7,66 +7,162 @@
 
 <style>
   body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: #f2f2f2;
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    background: #f0f2f5;
   }
-  h1 { text-align: center; }
+
+  header {
+    background: #6a11cb;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    padding: 20px;
+    color: white;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+  }
+
+  h2 {
+    margin-left: 20px;
+    margin-top: 30px;
+    color: #333;
+  }
+
+  /* GRID DEL CATALOGO */
+  #catalog {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 20px;
+  }
 
   .product {
     background: white;
     padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 0 5px #aaa;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
-  .cart {
-    background: #fff2c6;
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 20px;
+  .product:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
   }
 
-  button {
+  .product img {
+    width: 100%;
+    border-radius: 10px;
+    height: 150px;
+    object-fit: cover;
+  }
+
+  .btn {
+    margin-top: 10px;
     padding: 10px;
+    width: 100%;
     border: none;
-    background: #0074ff;
+    border-radius: 8px;
+    background: #2575fc;
     color: white;
-    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+  }
+
+  .btn:hover {
+    background: #1c5cd6;
+  }
+
+  /* CARRITO */
+  .cart-box {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .delete-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
     cursor: pointer;
   }
 
-  button.red {
-    background: red;
+  /* ADMIN */
+  .admin-box {
+    background: #ffffff;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    margin-bottom: 12px;
+  }
+
+  .admin-btn {
+    width: 100%;
+    background: #6a11cb;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .admin-btn:hover {
+    background: #5710a8;
+  }
+
 </style>
 </head>
 
 <body>
 
-<h1>PIPIA VARIEDADES</h1>
+<header>PIPIA VARIEDADES</header>
 
 <h2>Catálogo</h2>
 <div id="catalog"></div>
 
 <h2>Carrito</h2>
-<div class="cart" id="cart"></div>
+<div class="cart-box" id="cart"></div>
 
-<h2>Admin</h2>
-<input id="adminPass" type="password" placeholder="Contraseña admin">
-<button onclick="loginAdmin()">Entrar</button>
+<h2>Administrador</h2>
+<div class="admin-box">
+  <input id="adminPass" type="password" placeholder="Contraseña admin">
+  <button class="admin-btn" onclick="loginAdmin()">Entrar</button>
 
-<div id="adminPanel" style="display:none;">
-  <h3>Agregar producto</h3>
-  <input id="pName" placeholder="Nombre"><br><br>
-  <input id="pPrice" type="number" placeholder="Precio"><br><br>
-  <input id="pImg" type="file"><br><br>
-  <button onclick="addProduct()">Agregar producto</button>
+  <div id="adminPanel" style="display:none; margin-top:20px;">
+    <h3>Agregar producto</h3>
+    <input id="pName" placeholder="Nombre del producto">
+    <input id="pPrice" type="number" placeholder="Precio">
+    <input id="pImg" type="file">
+    <button class="admin-btn" onclick="addProduct()">Agregar producto</button>
+  </div>
 </div>
 
 <script>
-// =================== LOCALSTORAGE ===================
+// ---------- LOCAL STORAGE ----------
 function load(key, fallback) {
   try {
     const val = JSON.parse(localStorage.getItem(key));
@@ -80,17 +176,16 @@ function save(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-// =================== DATA ===================
 let products = load("products", []);
 let cart = load("cart", []);
 
-// =================== CATÁLOGO ===================
+// ---------- RENDER DEL CATALOGO ----------
 function renderCatalog() {
   const div = document.getElementById("catalog");
   div.innerHTML = "";
 
   if (products.length === 0) {
-    div.innerHTML = "<em>No hay productos aún.</em>";
+    div.innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#777;'>No hay productos aún.</p>";
     return;
   }
 
@@ -98,16 +193,16 @@ function renderCatalog() {
     const box = document.createElement("div");
     box.className = "product";
     box.innerHTML = `
-      <img src="${p.img}" width="120"><br>
-      <strong>${p.name}</strong><br>
-      Q${p.price}<br><br>
-      <button onclick="addToCart(${i})">Agregar al carrito</button>
+      <img src="${p.img}">
+      <h3>${p.name}</h3>
+      <p><strong>Q${p.price}</strong></p>
+      <button class="btn" onclick="addToCart(${i})">Agregar al carrito</button>
     `;
     div.appendChild(box);
   });
 }
 
-// =================== CARRITO ===================
+// ---------- CARRITO ----------
 function renderCart() {
   const div = document.getElementById("cart");
 
@@ -121,15 +216,16 @@ function renderCart() {
 
   cart.forEach((c, i) => {
     html += `
-      <div>
-        ${c.name} - Q${c.price}
-        <button class="red" onclick="removeCart(${i})">X</button>
+      <div class='cart-item'>
+        <span>${c.name} — Q${c.price}</span>
+        <button class="delete-btn" onclick="removeCart(${i})">X</button>
       </div>
     `;
     total += Number(c.price);
   });
 
-  html += `<h3>Total: Q${total}</h3>`;
+  html += `<h3 style="margin-top:15px;">Total: Q${total}</h3>`;
+
   div.innerHTML = html;
 }
 
@@ -145,9 +241,10 @@ function removeCart(i) {
   renderCart();
 }
 
-// =================== ADMIN ===================
+// ---------- ADMIN ----------
 function loginAdmin() {
   const pass = document.getElementById("adminPass").value;
+
   if (pass === "1234") {
     document.getElementById("adminPanel").style.display = "block";
   } else {
@@ -159,8 +256,8 @@ function addProduct() {
   const name = document.getElementById("pName").value;
   const price = document.getElementById("pPrice").value;
   const file = document.getElementById("pImg").files[0];
-  
-  if (!name || !price || !file) return alert("Completa todos los campos");
+
+  if (!name || !price || !file) return alert("Faltan datos");
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -171,16 +268,15 @@ function addProduct() {
     });
     save("products", products);
     renderCatalog();
-    alert("Producto agregado");
+    alert("Producto agregado exitosamente ✓");
   };
 
   reader.readAsDataURL(file);
 }
 
-// =================== INICIAL ===================
+// ---------- INICIO ----------
 renderCatalog();
 renderCart();
-
 </script>
 
 </body>
