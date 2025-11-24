@@ -1,79 +1,282 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pipia Yogu</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pipia Yogurt - Secciones (Tarjetas)</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fdf5f2; --accent:#f7c8d0; --muted:#7a5c61; --card:#ffffff; --cta:#a4d6d3;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Quicksand",sans-serif;background:var(--bg);color:#333}
+header{background:var(--accent);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-title{font-weight:700;font-size:18px;color:#4a4a4a}
+.header-actions{display:flex;gap:10px;align-items:center}
+.btn{background:var(--cta);border:none;padding:8px 12px;border-radius:16px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+.container{padding:18px}
+.section{margin-bottom:22px}
+.section h2{font-size:18px;margin:0 0 10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.card{background:var(--card);border-radius:12px;padding:8px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.card img{width:100%;height:110px;object-fit:cover;border-radius:8px}
+.card h4{margin:8px 0 4px;font-size:14px}
+.card p{margin:0;font-size:13px;color:#666}
+.card .add{margin-top:8px;padding:8px 10px;border-radius:10px;border:none;background:var(--cta);font-weight:700;cursor:pointer}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: "Poppins", sans-serif;
-            background: #fdeff2;
-        }
+#adminPanel{display:none;background:#fff0f3;padding:12px;border-radius:12px;position:fixed;left:12px;right:12px;bottom:12px;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.form-row{display:flex;gap:8px;flex-wrap:wrap}
+.input,select{padding:8px;border-radius:8px;border:1px solid #ddd;font-size:14px;width:100%}
+.small{width:48%}
+.admin-list{max-height:160px;overflow:auto;margin-top:8px}
+.admin-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee;font-size:14px}
 
-        header {
-            background: #f7c8d0;
-            padding: 12px;
-            text-align: center;
-            position: relative;
-        }
+#cartModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:20px;z-index:1000}
+#cartBox{background:#fff;border-radius:12px;padding:14px;width:100%;max-width:420px;max-height:80vh;overflow:auto}
+.cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
 
-        header h1 {
-            font-size: 22px;
-            margin: 0;
-            padding-right: 110px;
-        }
+.footer-space{height:70px}
 
-        /* BOTÓN CARRITO */
-        #cart-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #a0ddd6;
-            padding: 6px 12px;
-            border-radius: 18px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        /* SECCIONES */
-        .section {
-            padding: 22px;
-            font-size: 20px;
-            color: #633b42;
-        }
-
-        /* BOTÓN ADMIN */
-        #admin-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #f7c8d0;
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-    </style>
+@media(min-width:720px){
+  header{padding:18px 40px}
+  .header-title{font-size:22px}
+}
+</style>
 </head>
-
 <body>
 
-    <header>
-        <h1>Pipia Yogu</h1>
-        <div id="cart-btn">🛒 Carrito (0)</div>
-    </header>
+<header>
+  <div class="header-title">Pipia Yogurt</div>
+  <div class="header-actions">
+    <button id="cartBtn" class="btn">🛒 Carrito (0)</button>
+    <button id="openAdminTrigger" class="btn" style="background:#f9d6db;color:#333">ADMIN</button>
+  </div>
+</header>
 
-    <div class="section">Sección 1</div>
-    <div class="section">Sección 2</div>
-    <div class="section">Sección 3</div>
+<div class="container">
 
-    <div id="admin-btn">ADMIN</div>
+  <div class="section" id="sec1">
+    <h2>SABORES TODO EL AÑO</h2>
+    <div class="grid" id="grid-1"></div>
+  </div>
 
+  <div class="section" id="sec2">
+    <h2>SABORES DE TEMPORADA</h2>
+    <div class="grid" id="grid-2"></div>
+  </div>
+
+  <div class="section" id="sec3">
+    <h2>GRANOLA</h2>
+    <div class="grid" id="grid-3"></div>
+  </div>
+
+  <div class="footer-space"></div>
+</div>
+
+<!-- Admin panel (flotante) -->
+<div id="adminPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <strong>Panel Administrador</strong>
+    <button id="closeAdmin" class="btn" style="background:#ffd6e0">Cerrar</button>
+  </div>
+
+  <div class="form-row">
+    <input id="prodName" class="input small" placeholder="Nombre producto"/>
+    <input id="prodPrice" class="input small" placeholder="Precio (ej. 25.00)" type="number" step="0.01"/>
+  </div>
+  <div style="margin-top:8px" class="form-row">
+    <select id="prodSection" class="input small">
+      <option value="1">SABORES TODO EL AÑO</option>
+      <option value="2">SABORES DE TEMPORADA</option>
+      <option value="3">GRANOLA</option>
+    </select>
+    <input id="prodImg" class="input small" type="file" accept="image/*"/>
+  </div>
+
+  <div style="margin-top:8px;display:flex;gap:8px">
+    <button id="addProductBtn" class="btn">Agregar</button>
+    <button id="clearAll" class="btn" style="background:#ffd6e0">Eliminar todo</button>
+  </div>
+
+  <div style="margin-top:8px"><strong>Productos existentes</strong>
+    <div id="adminProducts" class="admin-list"></div>
+  </div>
+
+</div>
+
+<!-- Carrito modal -->
+<div id="cartModal"><div id="cartBox">
+  <h3>Tu pedido</h3>
+  <div id="cartItems"></div>
+  <div style="margin-top:10px">
+    <button id="sendBtn" class="btn" style="width:100%">Enviar por WhatsApp</button>
+  </div>
+</div></div>
+
+<script>
+/* ---------- Config ---------- */
+const ADMIN_PASS = 'Pipia30';
+const WA_NUMBER = '50256320811'; // cambia si necesitas otro número
+
+/* ---------- Helpers (compress image) ---------- */
+function compressFile(file, maxWidth = 900, quality = 0.7){
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onerror = e => rej(e);
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let canvas = document.createElement('canvas');
+        let scale = Math.min(1, maxWidth / img.width);
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        res(dataUrl);
+      };
+      img.onerror = e => rej(e);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- Data (init sample if empty) ---------- */
+let products = JSON.parse(localStorage.getItem('products')) || [
+  // sample product (uses your uploaded image path so the tool that hosts it can replace if needed)
+  { name: 'Yogurt Natural', price: '22.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 1 },
+  { name: 'Yogurt Mora (Temp)', price: '28.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 2 },
+  { name: 'Granola Crunch', price: '15.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 3 }
+];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function save(){
+  localStorage.setItem('products', JSON.stringify(products));
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+/* ---------- Render ---------- */
+function renderAll(){
+  for(let s=1;s<=3;s++){
+    const grid = document.getElementById('grid-'+s);
+    grid.innerHTML = '';
+    products.filter(p=>p.section===s).forEach((p,i)=>{
+      const idx = products.indexOf(p);
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <img src="${p.img}" alt="${p.name}" onerror="this.style.opacity=.4;this.alt='imagen no disponible'">
+        <h4>${p.name}</h4>
+        <p>Q ${p.price}</p>
+        <button class="add" onclick="addToCart(${idx})">Añadir</button>
+      `;
+      grid.appendChild(div);
+    });
+  }
+  updateCartCount();
+  renderAdminList();
+}
+
+function renderAdminList(){
+  const wrap = document.getElementById('adminProducts');
+  wrap.innerHTML = '';
+  products.forEach((p,i)=>{
+    const row = document.createElement('div');
+    row.className = 'admin-item';
+    row.innerHTML = `<div>${p.name} - Q${p.price}</div>
+      <div>
+        <button onclick="delProd(${i})" style="margin-right:6px">Eliminar</button>
+        <button onclick="editProd(${i})">Editar</button>
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+
+/* ---------- Cart ---------- */
+function addToCart(i){
+  cart.push(products[i]);
+  save();
+  updateCartCount();
+  alert('Agregado al carrito');
+}
+function removeFromCart(i){
+  cart.splice(i,1); save(); renderCart(); updateCartCount();
+}
+function updateCartCount(){ document.getElementById('cartBtn').textContent = `🛒 Carrito (${cart.length})`; }
+function renderCart(){
+  const box = document.getElementById('cartItems');
+  if(!cart.length){ box.innerHTML='<p>Carrito vacío.</p>'; return; }
+  box.innerHTML = '';
+  cart.forEach((c,i)=>{
+    const el = document.createElement('div');
+    el.className = 'cart-item';
+    el.innerHTML = `<div>${c.name} - Q${c.price}</div><div><button onclick="removeFromCart(${i})">❌</button></div>`;
+    box.appendChild(el);
+  });
+}
+
+/* ---------- Admin actions ---------- */
+document.getElementById('openAdminTrigger').addEventListener('click',()=>{
+  const pass = prompt('Contraseña administrador:');
+  if(pass === ADMIN_PASS) document.getElementById('adminPanel').style.display = 'block';
+  else alert('Contraseña incorrecta');
+});
+document.getElementById('closeAdmin').addEventListener('click',()=> document.getElementById('adminPanel').style.display='none');
+
+document.getElementById('addProductBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  const section = parseInt(document.getElementById('prodSection').value);
+  const file = document.getElementById('prodImg').files[0];
+  if(!name || !price || !file) return alert('Completa todos los campos y selecciona imagen');
+
+  try{
+    const compressed = await compressFile(file, 900, 0.7); // compress
+    products.push({ name, price, img: compressed, section });
+    save();
+    renderAll();
+    // clear form
+    document.getElementById('prodName').value=''; document.getElementById('prodPrice').value='';
+    document.getElementById('prodImg').value = null;
+    alert('Producto agregado');
+  }catch(e){ console.error(e); alert('Error al procesar imagen') }
+});
+
+document.getElementById('clearAll').addEventListener('click',()=>{
+  if(confirm('Eliminar TODOS los productos?')){ products=[]; save(); renderAll(); }
+});
+
+function delProd(i){
+  if(confirm('Eliminar este producto?')){ products.splice(i,1); save(); renderAll(); }
+}
+function editProd(i){
+  const p = products[i];
+  const newName = prompt('Nombre', p.name);
+  if(newName===null) return;
+  const newPrice = prompt('Precio', p.price);
+  if(newPrice===null) return;
+  products[i].name = newName;
+  products[i].price = newPrice;
+  save(); renderAll();
+}
+
+/* ---------- Cart modal ---------- */
+document.getElementById('cartBtn').addEventListener('click',()=>{
+  document.getElementById('cartModal').style.display = 'flex';
+  renderCart();
+});
+document.getElementById('cartModal').addEventListener('click',(e)=>{ if(e.target.id === 'cartModal') e.target.style.display='none'; });
+
+document.getElementById('sendBtn').addEventListener('click', ()=>{
+  if(!cart.length) return alert('Carrito vacío');
+  const text = encodeURIComponent('Mi pedido:%0A' + cart.map(p=>`${p.name} Q${p.price}`).join('%0A'));
+  window.open(`https://wa.me/${WA_NUMBER}?text=${text}`, '_blank');
+});
+
+/* ---------- Init ---------- */
+renderAll();
+</script>
 </body>
 </html>
