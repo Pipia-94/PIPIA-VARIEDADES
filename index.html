@@ -3,12 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pipia Yogurt - Secciones (Tarjetas)</title>
+<title>Pipia Yogurt - Secciones (Tarjetas) - GitHub Sync</title>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#fdf5f2; --accent:#f7c8d0; --muted:#7a5c61; --card:#ffffff; --cta:#a4d6d3;
-}
+:root{--bg:#fdf5f2;--accent:#f7c8d0;--muted:#7a5c61;--card:#ffffff;--cta:#a4d6d3;}
 *{box-sizing:border-box}
 body{margin:0;font-family:"Quicksand",sans-serif;background:var(--bg);color:#333}
 header{background:var(--accent);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -35,13 +33,7 @@ header{background:var(--accent);padding:14px 16px;display:flex;align-items:cente
 #cartModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:20px;z-index:1000}
 #cartBox{background:#fff;border-radius:12px;padding:14px;width:100%;max-width:420px;max-height:80vh;overflow:auto}
 .cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
-
 .footer-space{height:70px}
-
-@media(min-width:720px){
-  header{padding:18px 40px}
-  .header-title{font-size:22px}
-}
 </style>
 </head>
 <body>
@@ -95,14 +87,20 @@ header{background:var(--accent);padding:14px 16px;display:flex;align-items:cente
   </div>
 
   <div style="margin-top:8px;display:flex;gap:8px">
-    <button id="addProductBtn" class="btn">Agregar</button>
-    <button id="clearAll" class="btn" style="background:#ffd6e0">Eliminar todo</button>
+    <button id="addProductBtn" class="btn">Agregar (sube a GitHub)</button>
+    <button id="clearAll" class="btn" style="background:#ffd6e0">Eliminar todo (repo)</button>
   </div>
 
   <div style="margin-top:8px"><strong>Productos existentes</strong>
     <div id="adminProducts" class="admin-list"></div>
   </div>
 
+  <hr style="margin-top:8px"/>
+  <div><small>Token GitHub (no lo guardamos en repo):</small></div>
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <input id="ghTokenInput" placeholder="Pega aquí tu token" style="padding:8px;border-radius:8px;border:1px solid #ddd;width:100%"/>
+    <button id="saveTokenBtn" class="btn" style="background:#ffd6e0">Guardar token</button>
+  </div>
 </div>
 
 <!-- Carrito modal -->
@@ -115,50 +113,102 @@ header{background:var(--accent);padding:14px 16px;display:flex;align-items:cente
 </div></div>
 
 <script>
-/* ---------- Config ---------- */
+/* CONFIG - cambia si quieres */
+const OWNER = 'Pipia-94';
+const REPO = 'PIPIA-VARIEDADES';
+const BRANCH = 'main'; // o 'master' según tu repo
 const ADMIN_PASS = 'Pipia30';
-const WA_NUMBER = '50256320811'; // cambia si necesitas otro número
+const WA_NUMBER = '50256320811';
 
-/* ---------- Helpers (compress image) ---------- */
+/* helpers */
+function b64EncodeUnicode(str){ return btoa(unescape(encodeURIComponent(str))); } // for JSON content
+
+// compress image to dataURL
 function compressFile(file, maxWidth = 900, quality = 0.7){
   return new Promise((res, rej) => {
     const reader = new FileReader();
-    reader.onerror = e => rej(e);
-    reader.onload = () => {
+    reader.onerror = e=>rej(e);
+    reader.onload = ()=>{
       const img = new Image();
-      img.onload = () => {
-        let canvas = document.createElement('canvas');
-        let scale = Math.min(1, maxWidth / img.width);
+      img.onload = ()=>{
+        const canvas = document.createElement('canvas');
+        const scale = Math.min(1, maxWidth / img.width);
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg', quality);
         res(dataUrl);
       };
-      img.onerror = e => rej(e);
+      img.onerror = e=>rej(e);
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
   });
 }
 
-/* ---------- Data (init sample if empty) ---------- */
-let products = JSON.parse(localStorage.getItem('products')) || [
-  // sample product (uses your uploaded image path so the tool that hosts it can replace if needed)
-  { name: 'Yogurt Natural', price: '22.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 1 },
-  { name: 'Yogurt Mora (Temp)', price: '28.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 2 },
-  { name: 'Granola Crunch', price: '15.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 3 }
-];
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-function save(){
-  localStorage.setItem('products', JSON.stringify(products));
-  localStorage.setItem('cart', JSON.stringify(cart));
+/* GitHub API helpers */
+function getAuthHeaders(){
+  const token = sessionStorage.getItem('gh_token');
+  return {
+    'Authorization': `token ${token}`,
+    'Accept': 'application/vnd.github.v3+json'
+  };
 }
 
+async function getFileSha(path){
+  const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${BRANCH}`;
+  const resp = await fetch(url, { headers: getAuthHeaders() });
+  if(resp.status === 404) return null;
+  if(!resp.ok) throw new Error('Error obtener SHA: '+resp.status);
+  const j = await resp.json();
+  return j.sha;
+}
+
+async function uploadFileToGitHub(path, base64Content, message){
+  // base64Content must be without data:image/... header (pure base64)
+  const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}`;
+  const sha = await getFileSha(path);
+  const body = {
+    message: message || `Update ${path}`,
+    content: base64Content,
+    branch: BRANCH
+  };
+  if(sha) body.sha = sha;
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  });
+  if(!resp.ok){
+    const txt = await resp.text();
+    throw new Error('Error subir archivo: ' + resp.status + ' ' + txt);
+  }
+  return await resp.json();
+}
+
+async function getProductosJson(){
+  const path = 'productos.json';
+  const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`;
+  const resp = await fetch(url, { headers: getAuthHeaders() });
+  if(resp.status === 404) return null;
+  if(!resp.ok) throw new Error('Error obtener productos.json');
+  const j = await resp.json();
+  // content is base64
+  const jsonStr = atob(j.content);
+  return { data: JSON.parse(jsonStr), sha: j.sha };
+}
+
+/* ---------- App data (local cache) ---------- */
+let products = []; // filled from repo
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+/* Inicial sample -- this uses the local uploaded image path for demo only */
+const SAMPLE_IMG_PATH = '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg';
+
 /* ---------- Render ---------- */
-function renderAll(){
+function renderAllLocal(){
+  // render into sections from products (client-side state)
   for(let s=1;s<=3;s++){
     const grid = document.getElementById('grid-'+s);
     grid.innerHTML = '';
@@ -197,17 +247,15 @@ function renderAdminList(){
 /* ---------- Cart ---------- */
 function addToCart(i){
   cart.push(products[i]);
-  save();
+  localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
   alert('Agregado al carrito');
 }
-function removeFromCart(i){
-  cart.splice(i,1); save(); renderCart(); updateCartCount();
-}
+function removeFromCart(i){ cart.splice(i,1); localStorage.setItem('cart', JSON.stringify(cart)); renderCart(); updateCartCount(); }
 function updateCartCount(){ document.getElementById('cartBtn').textContent = `🛒 Carrito (${cart.length})`; }
 function renderCart(){
   const box = document.getElementById('cartItems');
-  if(!cart.length){ box.innerHTML='<p>Carrito vacío.</p>'; return; }
+  if(!cart.length){ box.innerHTML = '<p>Carrito vacío.</p>'; return; }
   box.innerHTML = '';
   cart.forEach((c,i)=>{
     const el = document.createElement('div');
@@ -217,13 +265,35 @@ function renderCart(){
   });
 }
 
-/* ---------- Admin actions ---------- */
-document.getElementById('openAdminTrigger').addEventListener('click',()=>{
+/* ---------- Admin actions (GitHub-backed) ---------- */
+document.getElementById('openAdminTrigger').addEventListener('click', async ()=>{
   const pass = prompt('Contraseña administrador:');
-  if(pass === ADMIN_PASS) document.getElementById('adminPanel').style.display = 'block';
-  else alert('Contraseña incorrecta');
+  if(pass !== ADMIN_PASS) return alert('Contraseña incorrecta');
+  // ask for token if not in sessionStorage
+  let token = sessionStorage.getItem('gh_token');
+  if(!token){
+    const input = prompt('Pega tu GitHub Personal Access Token (scopes: repo:contents). Este token se guardará en esta sesión (no en el repo).');
+    if(!input) return alert('Token necesario para subir archivos a GitHub.');
+    sessionStorage.setItem('gh_token', input.trim());
+  }
+  // try load productos.json from repo to sync local state
+  try{
+    await loadProductosFromRepo();
+    document.getElementById('adminPanel').style.display = 'block';
+  }catch(err){
+    alert('Error al conectar GitHub: ' + err.message);
+    console.error(err);
+  }
 });
-document.getElementById('closeAdmin').addEventListener('click',()=> document.getElementById('adminPanel').style.display='none');
+
+document.getElementById('saveTokenBtn').addEventListener('click', ()=>{
+  const t = document.getElementById('ghTokenInput').value.trim();
+  if(!t) return alert('Pega el token');
+  sessionStorage.setItem('gh_token', t);
+  alert('Token guardado en esta sesión.');
+});
+
+document.getElementById('closeAdmin').addEventListener('click', ()=> document.getElementById('adminPanel').style.display='none');
 
 document.getElementById('addProductBtn').addEventListener('click', async ()=>{
   const name = document.getElementById('prodName').value.trim();
@@ -233,41 +303,98 @@ document.getElementById('addProductBtn').addEventListener('click', async ()=>{
   if(!name || !price || !file) return alert('Completa todos los campos y selecciona imagen');
 
   try{
-    const compressed = await compressFile(file, 900, 0.7); // compress
-    products.push({ name, price, img: compressed, section });
-    save();
-    renderAll();
+    // 1) compress to dataURL
+    const compressedDataUrl = await compressFile(file, 900, 0.7);
+    // 2) strip header and upload image file to repo images/<timestamp>.jpg
+    const base64 = compressedDataUrl.split(',')[1];
+    const filename = `images/${Date.now()}.jpg`;
+    await uploadFileToGitHub(filename, base64, `Upload image ${filename}`);
+    // 3) construct raw image url (public)
+    const imageUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${filename}`;
+    // 4) load current productos.json, append new product, and upload productos.json
+    let repoObj = await getProductosJson(); // may be null
+    let arr = repoObj ? repoObj.data : [];
+    arr.push({ name, price, img: imageUrl, section });
+    const jsonStr = JSON.stringify(arr, null, 2);
+    const jsonBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    await uploadFileToGitHub('productos.json', jsonBase64, `Add product ${name}`);
+    // 5) refresh local state
+    await loadProductosFromRepo();
     // clear form
-    document.getElementById('prodName').value=''; document.getElementById('prodPrice').value='';
-    document.getElementById('prodImg').value = null;
-    alert('Producto agregado');
-  }catch(e){ console.error(e); alert('Error al procesar imagen') }
+    document.getElementById('prodName').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodImg').value=null;
+    alert('Producto agregado y sincronizado en GitHub ✅');
+  }catch(err){
+    console.error(err); alert('Error al subir producto: '+err.message);
+  }
 });
 
-document.getElementById('clearAll').addEventListener('click',()=>{
-  if(confirm('Eliminar TODOS los productos?')){ products=[]; save(); renderAll(); }
+document.getElementById('clearAll').addEventListener('click', async ()=>{
+  if(!confirm('Eliminar TODOS los productos del archivo productos.json en el repo?')) return;
+  try{
+    const empty = [];
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(empty, null, 2))));
+    await uploadFileToGitHub('productos.json', b64, 'Clear productos.json');
+    await loadProductosFromRepo();
+    alert('productos.json reiniciado.');
+  }catch(err){ console.error(err); alert('Error: '+err.message); }
 });
 
-function delProd(i){
-  if(confirm('Eliminar este producto?')){ products.splice(i,1); save(); renderAll(); }
-}
-function editProd(i){
+async function editProd(i){
   const p = products[i];
-  const newName = prompt('Nombre', p.name);
-  if(newName===null) return;
-  const newPrice = prompt('Precio', p.price);
-  if(newPrice===null) return;
-  products[i].name = newName;
-  products[i].price = newPrice;
-  save(); renderAll();
+  const newName = prompt('Nombre', p.name); if(newName===null) return;
+  const newPrice = prompt('Precio', p.price); if(newPrice===null) return;
+  // modify local array
+  products[i].name = newName; products[i].price = newPrice;
+  // upload productos.json
+  try{
+    const jsonStr = JSON.stringify(products, null, 2);
+    const jsonBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    await uploadFileToGitHub('productos.json', jsonBase64, `Edit product ${newName}`);
+    await loadProductosFromRepo();
+    alert('Producto editado y sincronizado.');
+  }catch(err){ console.error(err); alert('Error al editar: '+err.message); }
+}
+
+async function delProd(i){
+  if(!confirm('Eliminar este producto del repo?')) return;
+  products.splice(i,1);
+  try{
+    const jsonStr = JSON.stringify(products, null, 2);
+    const jsonBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    await uploadFileToGitHub('productos.json', jsonBase64, 'Delete product');
+    await loadProductosFromRepo();
+    alert('Producto eliminado.');
+  }catch(err){ console.error(err); alert('Error: '+err.message); }
+}
+
+/* ---------- Load productos.json from repo into local products[] ---------- */
+async function loadProductosFromRepo(){
+  try{
+    const obj = await getProductosJson();
+    if(obj && Array.isArray(obj.data)){
+      products = obj.data;
+    }else{
+      // create initial sample if none
+      products = [
+        { name: 'Yogurt Natural', price: '22.00', img: SAMPLE_IMG_PATH, section: 1 },
+        { name: 'Yogurt Mora (Temp)', price: '28.00', img: SAMPLE_IMG_PATH, section: 2 },
+        { name: 'Granola Crunch', price: '15.00', img: SAMPLE_IMG_PATH, section: 3 }
+      ];
+      // NOTE: we do not auto-upload the sample; admin can 'Agregar' to persist
+    }
+    renderAllLocal();
+  }catch(err){
+    console.error(err);
+    throw err;
+  }
 }
 
 /* ---------- Cart modal ---------- */
-document.getElementById('cartBtn').addEventListener('click',()=>{
+document.getElementById('cartBtn').addEventListener('click', ()=>{
   document.getElementById('cartModal').style.display = 'flex';
   renderCart();
 });
-document.getElementById('cartModal').addEventListener('click',(e)=>{ if(e.target.id === 'cartModal') e.target.style.display='none'; });
+document.getElementById('cartModal').addEventListener('click',(e)=>{ if(e.target.id==='cartModal') e.target.style.display='none'; });
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   if(!cart.length) return alert('Carrito vacío');
@@ -275,8 +402,32 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   window.open(`https://wa.me/${WA_NUMBER}?text=${text}`, '_blank');
 });
 
-/* ---------- Init ---------- */
-renderAll();
+/* ---------- Init on page load ---------- */
+(async function init(){
+  // try to load productos.json without token (public), but GitHub API requires auth for raw repo access sometimes
+  try{
+    // try unauthenticated raw.json first (fast)
+    const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/productos.json`;
+    const r = await fetch(rawUrl);
+    if(r.ok){
+      const arr = await r.json();
+      products = Array.isArray(arr) ? arr : [];
+      renderAllLocal();
+      return;
+    }
+  }catch(e){ /* ignore */ }
+
+  // otherwise use API (no token required for public read)
+  try{ await loadProductosFromRepo(); }catch(e){ 
+    // fallback to sample
+    products = [
+      { name: 'Yogurt Natural', price: '22.00', img: SAMPLE_IMG_PATH, section: 1 },
+      { name: 'Yogurt Mora (Temp)', price: '28.00', img: SAMPLE_IMG_PATH, section: 2 },
+      { name: 'Granola Crunch', price: '15.00', img: SAMPLE_IMG_PATH, section: 3 }
+    ];
+    renderAllLocal();
+  }
+})();
 </script>
 </body>
 </html>
