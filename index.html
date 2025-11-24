@@ -3,70 +3,98 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pipia Yogurt - Catálogo Largo</title>
+<title>Pipia Yogurt - Secciones (Tarjetas)</title>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fdf5f2;--accent:#f7c8d0;--muted:#7a5c61;--card:#fff;--cta:#a4d6d3}
+:root{
+  --bg:#fdf5f2; --accent:#f7c8d0; --muted:#7a5c61; --card:#ffffff; --cta:#a4d6d3;
+}
 *{box-sizing:border-box}
 body{margin:0;font-family:"Quicksand",sans-serif;background:var(--bg);color:#333}
-header{background:var(--accent);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
-.header-title{font-weight:700;font-size:18px}
-.btn{background:var(--cta);border:none;padding:8px 12px;border-radius:16px;font-weight:700;cursor:pointer}
-.container{padding:14px}
-.title-block{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.title-block h2{margin:0;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+header{background:var(--accent);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-title{font-weight:700;font-size:18px;color:#4a4a4a}
+.header-actions{display:flex;gap:10px;align-items:center}
+.btn{background:var(--cta);border:none;padding:8px 12px;border-radius:16px;font-weight:700;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+.container{padding:18px}
+.section{margin-bottom:22px}
+.section h2{font-size:18px;margin:0 0 10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
 .card{background:var(--card);border-radius:12px;padding:8px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.card img{width:100%;height:140px;object-fit:cover;border-radius:8px}
+.card img{width:100%;height:110px;object-fit:cover;border-radius:8px}
 .card h4{margin:8px 0 4px;font-size:14px}
 .card p{margin:0;font-size:13px;color:#666}
 .card .add{margin-top:8px;padding:8px 10px;border-radius:10px;border:none;background:var(--cta);font-weight:700;cursor:pointer}
 
-#adminPanel{display:none;position:fixed;left:12px;right:12px;bottom:12px;background:#fff0f3;padding:12px;border-radius:12px;z-index:999}
-.admin-list{max-height:150px;overflow:auto;margin-top:8px}
-.admin-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
+#adminPanel{display:none;background:#fff0f3;padding:12px;border-radius:12px;position:fixed;left:12px;right:12px;bottom:12px;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.form-row{display:flex;gap:8px;flex-wrap:wrap}
+.input,select{padding:8px;border-radius:8px;border:1px solid #ddd;font-size:14px;width:100%}
+.small{width:48%}
+.admin-list{max-height:160px;overflow:auto;margin-top:8px}
+.admin-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee;font-size:14px}
 
 #cartModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:20px;z-index:1000}
 #cartBox{background:#fff;border-radius:12px;padding:14px;width:100%;max-width:420px;max-height:80vh;overflow:auto}
 .cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
 
-.footer-space{height:80px}
+.footer-space{height:70px}
+
+@media(min-width:720px){
+  header{padding:18px 40px}
+  .header-title{font-size:22px}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-title">Pipia Yogurt - Catálogo</div>
-  <div>
+  <div class="header-title">Pipia Yogurt</div>
+  <div class="header-actions">
     <button id="cartBtn" class="btn">🛒 Carrito (0)</button>
     <button id="openAdminTrigger" class="btn" style="background:#f9d6db;color:#333">ADMIN</button>
   </div>
 </header>
 
 <div class="container">
-  <!-- Single long grid, but we place headings between items -->
-  <div class="title-block"><h2>SABORES TODO EL AÑO</h2></div>
-  <div id="gridAll" class="grid"></div>
+
+  <div class="section" id="sec1">
+    <h2>SABORES TODO EL AÑO</h2>
+    <div class="grid" id="grid-1"></div>
+  </div>
+
+  <div class="section" id="sec2">
+    <h2>SABORES DE TEMPORADA</h2>
+    <div class="grid" id="grid-2"></div>
+  </div>
+
+  <div class="section" id="sec3">
+    <h2>GRANOLA</h2>
+    <div class="grid" id="grid-3"></div>
+  </div>
+
   <div class="footer-space"></div>
 </div>
 
-<!-- Admin Panel -->
+<!-- Admin panel (flotante) -->
 <div id="adminPanel">
-  <div style="display:flex;justify-content:space-between;align-items:center">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
     <strong>Panel Administrador</strong>
     <button id="closeAdmin" class="btn" style="background:#ffd6e0">Cerrar</button>
   </div>
-  <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-    <input id="prodName" placeholder="Nombre" class="input" style="padding:8px;border-radius:8px;border:1px solid #ddd;width:48%"/>
-    <input id="prodPrice" placeholder="Precio" type="number" class="input" style="padding:8px;border-radius:8px;border:1px solid #ddd;width:22%"/>
-    <select id="prodSection" class="input" style="padding:8px;border-radius:8px;border:1px solid #ddd;width:22%">
-      <option value="1">TODO EL AÑO</option>
-      <option value="2">TEMPORADA</option>
+
+  <div class="form-row">
+    <input id="prodName" class="input small" placeholder="Nombre producto"/>
+    <input id="prodPrice" class="input small" placeholder="Precio (ej. 25.00)" type="number" step="0.01"/>
+  </div>
+  <div style="margin-top:8px" class="form-row">
+    <select id="prodSection" class="input small">
+      <option value="1">SABORES TODO EL AÑO</option>
+      <option value="2">SABORES DE TEMPORADA</option>
       <option value="3">GRANOLA</option>
     </select>
+    <input id="prodImg" class="input small" type="file" accept="image/*"/>
   </div>
+
   <div style="margin-top:8px;display:flex;gap:8px">
-    <input id="prodImg" type="file" accept="image/*" />
     <button id="addProductBtn" class="btn">Agregar</button>
     <button id="clearAll" class="btn" style="background:#ffd6e0">Eliminar todo</button>
   </div>
@@ -74,9 +102,10 @@ header{background:var(--accent);padding:12px 16px;display:flex;align-items:cente
   <div style="margin-top:8px"><strong>Productos existentes</strong>
     <div id="adminProducts" class="admin-list"></div>
   </div>
+
 </div>
 
-<!-- Cart -->
+<!-- Carrito modal -->
 <div id="cartModal"><div id="cartBox">
   <h3>Tu pedido</h3>
   <div id="cartItems"></div>
@@ -86,61 +115,68 @@ header{background:var(--accent);padding:12px 16px;display:flex;align-items:cente
 </div></div>
 
 <script>
+/* ---------- Config ---------- */
 const ADMIN_PASS = 'Pipia30';
-const WA_NUMBER = '50256320811';
+const WA_NUMBER = '50256320811'; // cambia si necesitas otro número
 
+/* ---------- Helpers (compress image) ---------- */
 function compressFile(file, maxWidth = 900, quality = 0.7){
-  return new Promise((res,rej)=>{
+  return new Promise((res, rej) => {
     const reader = new FileReader();
-    reader.onerror = e=>rej(e);
-    reader.onload = ()=>{
+    reader.onerror = e => rej(e);
+    reader.onload = () => {
       const img = new Image();
-      img.onload = ()=>{
+      img.onload = () => {
         let canvas = document.createElement('canvas');
         let scale = Math.min(1, maxWidth / img.width);
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/jpeg', quality);
         res(dataUrl);
       };
-      img.onerror = e=>rej(e);
+      img.onerror = e => rej(e);
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
   });
 }
 
-/* initial data */
+/* ---------- Data (init sample if empty) ---------- */
 let products = JSON.parse(localStorage.getItem('products')) || [
+  // sample product (uses your uploaded image path so the tool that hosts it can replace if needed)
   { name: 'Yogurt Natural', price: '22.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 1 },
   { name: 'Yogurt Mora (Temp)', price: '28.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 2 },
   { name: 'Granola Crunch', price: '15.00', img: '/mnt/data/WhatsApp Image 2025-11-23 at 8.08.57 PM.jpeg', section: 3 }
 ];
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-function save(){ localStorage.setItem('products', JSON.stringify(products)); localStorage.setItem('cart', JSON.stringify(cart)); }
+function save(){
+  localStorage.setItem('products', JSON.stringify(products));
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
 
+/* ---------- Render ---------- */
 function renderAll(){
-  const grid = document.getElementById('gridAll');
-  grid.innerHTML = '';
-  // Order: first section 1, then insert a heading, section 2 heading, section3 heading
-  const order = [1,2,3];
-  order.forEach(section=>{
-    // insert a small full-width divider with the section title
-    const divider = document.createElement('div');
-    divider.style.gridColumn = '1 / -1';
-    divider.innerHTML = `<h3 style="margin:10px 0;color:#7a5c61">${ section===1 ? 'SABORES TODO EL AÑO' : section===2 ? 'SABORES DE TEMPORADA' : 'GRANOLA' }</h3>`;
-    grid.appendChild(divider);
-    products.filter(p=>p.section===section).forEach(p=>{
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `<img src="${p.img}" alt="${p.name}" onerror="this.style.opacity=.4;this.alt='imagen no disponible'"><h4>${p.name}</h4><p>Q ${p.price}</p><button class="add" onclick="addToCartByObj('${encodeURIComponent(p.name)}')">Añadir</button>`;
-      grid.appendChild(card);
+  for(let s=1;s<=3;s++){
+    const grid = document.getElementById('grid-'+s);
+    grid.innerHTML = '';
+    products.filter(p=>p.section===s).forEach((p,i)=>{
+      const idx = products.indexOf(p);
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <img src="${p.img}" alt="${p.name}" onerror="this.style.opacity=.4;this.alt='imagen no disponible'">
+        <h4>${p.name}</h4>
+        <p>Q ${p.price}</p>
+        <button class="add" onclick="addToCart(${idx})">Añadir</button>
+      `;
+      grid.appendChild(div);
     });
-  });
-  updateCartCount(); renderAdminList();
+  }
+  updateCartCount();
+  renderAdminList();
 }
 
 function renderAdminList(){
@@ -150,22 +186,28 @@ function renderAdminList(){
     const row = document.createElement('div');
     row.className = 'admin-item';
     row.innerHTML = `<div>${p.name} - Q${p.price}</div>
-      <div><button onclick="delProd(${i})" style="margin-right:6px">Eliminar</button><button onclick="editProd(${i})">Editar</button></div>`;
+      <div>
+        <button onclick="delProd(${i})" style="margin-right:6px">Eliminar</button>
+        <button onclick="editProd(${i})">Editar</button>
+      </div>`;
     wrap.appendChild(row);
   });
 }
 
-/* Cart functions */
-function addToCartByObj(nameEncoded){
-  const name = decodeURIComponent(nameEncoded);
-  const idx = products.findIndex(p=>p.name===name);
-  if(idx!==-1){ cart.push(products[idx]); save(); updateCartCount(); alert('Agregado'); }
+/* ---------- Cart ---------- */
+function addToCart(i){
+  cart.push(products[i]);
+  save();
+  updateCartCount();
+  alert('Agregado al carrito');
 }
-function removeFromCart(i){ cart.splice(i,1); save(); renderCart(); updateCartCount(); }
+function removeFromCart(i){
+  cart.splice(i,1); save(); renderCart(); updateCartCount();
+}
 function updateCartCount(){ document.getElementById('cartBtn').textContent = `🛒 Carrito (${cart.length})`; }
 function renderCart(){
   const box = document.getElementById('cartItems');
-  if(!cart.length){ box.innerHTML = '<p>Carrito vacío.</p>'; return; }
+  if(!cart.length){ box.innerHTML='<p>Carrito vacío.</p>'; return; }
   box.innerHTML = '';
   cart.forEach((c,i)=>{
     const el = document.createElement('div');
@@ -175,11 +217,11 @@ function renderCart(){
   });
 }
 
-/* Admin events */
+/* ---------- Admin actions ---------- */
 document.getElementById('openAdminTrigger').addEventListener('click',()=>{
   const pass = prompt('Contraseña administrador:');
-  if(pass===ADMIN_PASS) document.getElementById('adminPanel').style.display='block';
-  else alert('Incorrecto');
+  if(pass === ADMIN_PASS) document.getElementById('adminPanel').style.display = 'block';
+  else alert('Contraseña incorrecta');
 });
 document.getElementById('closeAdmin').addEventListener('click',()=> document.getElementById('adminPanel').style.display='none');
 
@@ -188,31 +230,44 @@ document.getElementById('addProductBtn').addEventListener('click', async ()=>{
   const price = document.getElementById('prodPrice').value.trim();
   const section = parseInt(document.getElementById('prodSection').value);
   const file = document.getElementById('prodImg').files[0];
-  if(!name || !price || !file) return alert('Completa todos los campos');
+  if(!name || !price || !file) return alert('Completa todos los campos y selecciona imagen');
+
   try{
-    const compressed = await compressFile(file,900,0.7);
+    const compressed = await compressFile(file, 900, 0.7); // compress
     products.push({ name, price, img: compressed, section });
-    save(); renderAll();
-    document.getElementById('prodName').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodImg').value=null;
+    save();
+    renderAll();
+    // clear form
+    document.getElementById('prodName').value=''; document.getElementById('prodPrice').value='';
+    document.getElementById('prodImg').value = null;
     alert('Producto agregado');
-  }catch(e){ console.error(e); alert('Error imagen') }
+  }catch(e){ console.error(e); alert('Error al procesar imagen') }
 });
 
-document.getElementById('clearAll').addEventListener('click',()=>{ if(confirm('Eliminar TODOS?')){ products=[]; save(); renderAll(); } });
+document.getElementById('clearAll').addEventListener('click',()=>{
+  if(confirm('Eliminar TODOS los productos?')){ products=[]; save(); renderAll(); }
+});
 
-function delProd(i){ if(confirm('Eliminar este producto?')){ products.splice(i,1); save(); renderAll(); } }
+function delProd(i){
+  if(confirm('Eliminar este producto?')){ products.splice(i,1); save(); renderAll(); }
+}
 function editProd(i){
   const p = products[i];
-  const newName = prompt('Nombre', p.name); if(newName===null) return;
-  const newPrice = prompt('Precio', p.price); if(newPrice===null) return;
-  products[i].name=newName; products[i].price=newPrice; save(); renderAll();
+  const newName = prompt('Nombre', p.name);
+  if(newName===null) return;
+  const newPrice = prompt('Precio', p.price);
+  if(newPrice===null) return;
+  products[i].name = newName;
+  products[i].price = newPrice;
+  save(); renderAll();
 }
 
-/* Cart modal */
+/* ---------- Cart modal ---------- */
 document.getElementById('cartBtn').addEventListener('click',()=>{
-  document.getElementById('cartModal').style.display='flex'; renderCart();
+  document.getElementById('cartModal').style.display = 'flex';
+  renderCart();
 });
-document.getElementById('cartModal').addEventListener('click',(e)=>{ if(e.target.id==='cartModal') e.target.style.display='none'; });
+document.getElementById('cartModal').addEventListener('click',(e)=>{ if(e.target.id === 'cartModal') e.target.style.display='none'; });
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   if(!cart.length) return alert('Carrito vacío');
@@ -220,7 +275,7 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   window.open(`https://wa.me/${WA_NUMBER}?text=${text}`, '_blank');
 });
 
-/* init */
+/* ---------- Init ---------- */
 renderAll();
 </script>
 </body>
