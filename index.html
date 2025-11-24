@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pipia Yogurt - Catálogo</title>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
 body { margin:0; font-family:'Quicksand',sans-serif; background:#fdf5f2; color:#333; }
 header { background:#f9d6db; padding:25px; text-align:center; font-size:32px; font-weight:700; color:#4a4a4a; }
@@ -33,10 +34,12 @@ input, select { padding:8px; width:90%; margin-bottom:10px; border-radius:6px; b
   <h2>Sección 1</h2>
   <div class="product-grid" id="productList1"></div>
 </div>
+
 <div class="section" id="section2">
   <h2>Sección 2</h2>
   <div class="product-grid" id="productList2"></div>
 </div>
+
 <div class="section" id="section3">
   <h2>Sección 3</h2>
   <div class="product-grid" id="productList3"></div>
@@ -76,7 +79,9 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 function save(){ localStorage.setItem('products', JSON.stringify(products)); }
 
-function updateCartCount(){ document.getElementById('cartBtn').textContent = `🛒 Carrito (${cart.length})`; }
+function updateCartCount(){
+  document.getElementById('cartBtn').textContent = `🛒 Carrito (${cart.length})`;
+}
 
 function renderProducts() {
     [1,2,3].forEach(s => document.getElementById('productList'+s).innerHTML = '');
@@ -119,8 +124,9 @@ function removeFromCart(i){
 
 function renderCart(){
     const cartDiv = document.getElementById('cartItems');
-    if(cart.length===0){ cartDiv.innerHTML='<p>El carrito está vacío.</p>'; }
-    else{
+    if(cart.length===0){ 
+        cartDiv.innerHTML='<p>El carrito está vacío.</p>'; 
+    } else {
         cartDiv.innerHTML='';
         cart.forEach((p,i)=>{
             const item=document.createElement('div');
@@ -149,15 +155,33 @@ document.getElementById('addProductBtn').onclick = ()=>{
 
     let reader = new FileReader();
     reader.onload = ()=>{
-        products.push({name, price, img: reader.result, section});
-        save();
-        renderProducts();
-        renderAdmin();
 
-        document.getElementById('prodName').value='';
-        document.getElementById('prodPrice').value='';
-        document.getElementById('prodImg').value=null;
-        document.getElementById('prodSection').value='1';
+        const img = new Image();
+        img.src = reader.result;
+
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const MAX_WIDTH = 600;
+
+            let scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+
+            products.push({ name, price, img: compressedBase64, section });
+            save();
+            renderProducts();
+            renderAdmin();
+
+            document.getElementById('prodName').value='';
+            document.getElementById('prodPrice').value='';
+            document.getElementById('prodImg').value=null;
+            document.getElementById('prodSection').value='1';
+        };
     };
     reader.readAsDataURL(imgFile);
 };
@@ -179,11 +203,14 @@ document.getElementById('sendBtn').onclick=()=>{
     window.open(`https://wa.me/50256320811?text=Mi%20pedido:%0A${text}`);
 };
 
-document.getElementById('cartModal').onclick=(e)=>{ if(e.target.id==='cartModal') e.target.style.display='none'; };
+document.getElementById('cartModal').onclick=(e)=>{
+    if(e.target.id==='cartModal') e.target.style.display='none';
+};
 
 updateCartCount();
 renderProducts();
 renderAdmin();
 </script>
+
 </body>
 </html>
